@@ -24,11 +24,13 @@ pnpm preview
 
 El proyecto incluye `pnpm-lock.yaml` y solo autoriza el script de instalación de esbuild en `pnpm-workspace.yaml`. La distribución estática se genera en `dist/`. No necesita backend, claves ni variables de entorno.
 
-### Cámara y Sol
+### Cámara, Tierra y Sol
 
 La Luna y las ubicaciones permanecen fijas en el espacio. Tanto el arrastre como la órbita automática mueven exclusivamente la cámara alrededor de la Luna. El Sol de `src/scene/Sun.tsx` también ocupa una posición fija: puede salir del encuadre o quedar oculto por la Luna al cambiar el punto de vista. Su núcleo y halo dorado se renderizan en 3D con prueba de profundidad; la luz direccional proviene de esa misma dirección. El halo es procedural y no requiere imágenes externas ni nuevas dependencias. La posición y el tamaño del Sol siguen siendo ilustrativos, sin efemérides.
 
 ## Uso
+
+La Tierra se representa con radio medio de 6371 km frente a 1737,4 km de la Luna, y a 384.400 km entre centros: aproximadamente 3,67 veces el diámetro lunar. Por perspectiva se ve pequeña desde la cámara cercana a la Luna. Su posición fija en +X corresponde a la dirección terrestre media del marco lunar; no incluye libración ni cambia con el periodo. La vista inicial permite ver ambos cuerpos, conservando la distancia inicial, los límites de zoom y la órbita alrededor de la Luna. «Restablecer vista» recupera ese encuadre. Incluye textura local con nubes, un borde atmosférico estilizado y ocultación por profundidad. Referencia de escala: [NASA, Moon by the Numbers](https://science.nasa.gov/moon/by-the-numbers/).
 
 1. Pulsa la superficie de la Luna para colocar una ubicación o introduce latitud y longitud. Sur y oeste se expresan con signo negativo. Los campos admiten decimales; la lista redondea a tres decimales solo para mostrar, conservando la precisión de entrada.
 2. Arrastra con un dedo o ratón para orbitar; usa rueda o pellizco de dos dedos para zoom. La primera interacción detiene la rotación automática. «Restablecer vista» reinicia cámara, zoom y rotación. El movimiento aparente se obtiene orbitando la cámara alrededor de una Luna fija, de modo que las coordenadas y los marcadores no cambien de referencia.
@@ -71,7 +73,7 @@ El modelo utiliza una esfera de 1737,4 km y altura de observador cero. **No incl
 
 La formulación, referencias y validación están documentadas en [docs/SCIENCE.md](docs/SCIENCE.md). `pendingEngine` permanece como adaptador explícito de la primera versión y no se utiliza en el flujo de la aplicación.
 
-La textura del [CGI Moon Kit de NASA SVS](https://svs.gsfc.nasa.gov/4720/) se distribuye localmente con sus créditos en `public/textures/README.md`. Es un recurso visual, no un DEM. La luz de la escena, el Sol y las distancias son ilustrativos e independientes del periodo seleccionado. No representan una fase lunar ni un instante astronómico. Las fuentes tipográficas se solicitan a Google Fonts con sustitutos locales si no hay conexión; la escena y su textura no dependen de un servicio externo en ejecución.
+La textura del [CGI Moon Kit de NASA SVS](https://svs.gsfc.nasa.gov/4720/) y la textura terrestre de los ejemplos de Three.js se distribuyen localmente con créditos en `public/textures/README.md`. Son recursos visuales, no DEM. Los tamaños Tierra–Luna y su separación media están a escala; la luz de la escena y el Sol siguen siendo ilustrativos e independientes del periodo seleccionado. No representan una fase lunar ni un instante astronómico. Las fuentes tipográficas se solicitan a Google Fonts con sustitutos locales si no hay conexión; la escena y sus texturas no dependen de un servicio externo en ejecución.
 
 La siguiente iteración debe incorporar un DEM polar y un horizonte dependiente del azimut, validar marcos cartográficos de mayor precisión, modelar eclipses y definir requisitos de energía y telecomunicaciones por misión. También queda pendiente sincronizar la escena 3D y la reproducción temporal con las efemérides; las curvas del informe sí corresponden al periodo calculado.
 
