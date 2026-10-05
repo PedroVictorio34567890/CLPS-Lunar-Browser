@@ -2,12 +2,12 @@ import { useEffect, useMemo } from 'react';
 import { useTexture } from '@react-three/drei';
 import { AdditiveBlending, CanvasTexture, SRGBColorSpace } from 'three';
 
-// One scene unit is one lunar radius. Mean separation, not a dated ephemeris.
+// One scene unit is one lunar radius; position comes from dated ephemerides.
 const MOON_RADIUS_KM = 1737.4;
 export const EARTH_RADIUS = 6371 / MOON_RADIUS_KM;
-export const EARTH_DISTANCE = 384400 / MOON_RADIUS_KM;
 
-export function Earth() {
+
+export function Earth({ position }: { position: [number, number, number] }) {
   const map = useTexture('/textures/earth_atmos_2048.jpg');
   map.colorSpace = SRGBColorSpace;
   map.anisotropy = 8;
@@ -24,7 +24,7 @@ export function Earth() {
   }, []);
   useEffect(() => () => label.dispose(), [label]);
 
-  return <group name="earth" position={[EARTH_DISTANCE, 0, 0]}>
+  return <group name="earth" position={position}>
     <mesh raycast={() => null}>
       <sphereGeometry args={[EARTH_RADIUS, 64, 48]}/>
       <meshStandardMaterial map={map} roughness={0.85} metalness={0}/>

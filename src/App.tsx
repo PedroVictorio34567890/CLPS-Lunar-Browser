@@ -4,6 +4,7 @@ import { LocationPanel } from './components/LocationPanel';
 import { TimePanel } from './components/TimePanel';
 import { Timeline } from './components/Timeline';
 import { ComparisonPanel } from './components/ComparisonPanel';
+import { usePlayback } from './hooks/usePlayback';
 import { useSites } from './hooks/useSites';
 import { workerEngine } from './science/workerEngine';
 import { periodError } from './lib/period';
@@ -12,6 +13,7 @@ const MoonScene = lazy(() => import('./scene/MoonScene').then(module => ({ defau
 export default function App() {
   const { sites, addSite, editSite, removeSite } = useSites();
   const [period, setPeriod] = useState<AnalysisPeriod>({ start: '2026-09-27T00:00', end: '2026-10-04T00:00' });
+  const playback = usePlayback(period);
   const [report, setReport] = useState<ComparisonReport | null>(null);
   const [reportOpen, setReportOpen] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -24,7 +26,7 @@ export default function App() {
       <LocationPanel sites={sites} onAdd={addSite} onEdit={editSite} onRemove={removeSite}/>
       <TimePanel period={period} onChange={setPeriod}/>
       <div className="analyze-block"><button className="primary full" onClick={analyze} disabled={!sites.length || !!periodError(period) || busy}>{busy ? 'Calculando efemérides…' : 'Analizar y comparar'}<ArrowUpRight size={18}/></button><p>{!sites.length ? 'Selecciona al menos un lugar para continuar.' : periodError(period) ? 'Corrige el periodo para continuar.' : `${sites.length} ${sites.length === 1 ? 'lugar listo' : 'lugares listos'} para comparar.`}</p>{error && <p className="error" role="alert">{error}</p>}</div>
-    </aside><main className="main-surface"><div className="view-nav"><span className="active-tab"><Globe2 size={15}/> Superficie lunar</span><span className="view-trail">Luna <ChevronRight size={12}/> Polo sur</span><span className="view-tag">VISTA 3D</span></div><Suspense fallback={<div className="scene scene-fallback">Preparando el explorador lunar…</div>}><MoonScene sites={sites} onSelect={addSite}/></Suspense><Timeline period={period} report={currentReport} onOpenReport={() => setReportOpen(true)}/><div className="science-notice"><FlaskConical size={15}/><p><strong>Cálculo geométrico disponible.</strong> Efemérides sobre esfera sin relieve. La escena 3D es ilustrativa y no representa el periodo analizado.</p></div></main></div>
+    </aside><main className="main-surface"><div className="view-nav"><span className="active-tab"><Globe2 size={15}/> Superficie lunar</span><span className="view-trail">Luna <ChevronRight size={12}/> Polo sur</span><span className="view-tag">VISTA 3D</span></div><Suspense fallback={<div className="scene scene-fallback">Preparando el explorador lunar…</div>}><MoonScene sites={sites} onSelect={addSite} timestamp={playback.time}/></Suspense><Timeline playback={playback} report={currentReport} onOpenReport={() => setReportOpen(true)}/><div className="science-notice"><FlaskConical size={15}/><p><strong>Cálculo geométrico disponible.</strong> Efemérides sobre esfera sin relieve. Escena sincronizada con el instante UTC seleccionado. Sin sombras del relieve ni eclipses; brillo y atmósfera estilizados.</p></div></main></div>
     <footer className="footer"><span>CLPS LUNAR MISSION BROWSER <span className="muted">/</span> Proyecto para Space Apps 2026 · No oficial</span><a href="https://svs.gsfc.nasa.gov/4720/" target="_blank" rel="noreferrer">Textura: NASA Scientific Visualization Studio <ArrowUpRight size={12}/></a></footer>
     {report && reportOpen && <ComparisonPanel report={report} onClose={() => setReportOpen(false)}/>}
   </div>;

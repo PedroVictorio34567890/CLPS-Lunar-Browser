@@ -1,11 +1,11 @@
 import { useEffect, useMemo } from 'react';
 import { AdditiveBlending, CanvasTexture, SRGBColorSpace } from 'three';
 
-// Fixed world coordinates. Visual composition only, not an ephemeris.
+// Position and radius use lunar-radius units.
 // The visible Sun and the directional light share this direction.
-export const SUN_POSITION: [number, number, number] = [-18, 19, -38];
+const SUN_RADIUS = 695700 / 1737.4;
 
-export function Sun() {
+export function Sun({ position }: { position: [number, number, number] }) {
   const halo = useMemo(() => {
     const canvas = document.createElement('canvas');
     canvas.width = canvas.height = 256;
@@ -27,15 +27,15 @@ export function Sun() {
   useEffect(() => () => halo.dispose(), [halo]);
 
   return <>
-    <directionalLight position={SUN_POSITION} intensity={3.1} color="#fff4df" />
-    <group position={SUN_POSITION} name="sun">
+    <directionalLight position={position} intensity={3.1} color="#fff4df" />
+    <group position={position} name="sun">
       <mesh raycast={() => null}>
-        <sphereGeometry args={[0.62, 32, 24]} />
+        <sphereGeometry args={[SUN_RADIUS, 32, 24]} />
         <meshBasicMaterial color="#fff9e7" toneMapped={false} />
       </mesh>
       {/* A camera-facing glow anchored in world space. Depth testing lets
           the Moon occlude both the solar disc and its halo naturally. */}
-      <sprite scale={[10, 10, 1]} raycast={() => null}>
+      <sprite scale={[SUN_RADIUS * 12, SUN_RADIUS * 12, 1]} raycast={() => null}>
         <spriteMaterial
           map={halo}
           blending={AdditiveBlending}

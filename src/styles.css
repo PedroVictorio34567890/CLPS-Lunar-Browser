@@ -12,3 +12,16 @@
 @media(max-width:760px){.canvas-wrap{inset:130px 0 68px}.scene-status{top:155px}.scene-title p{max-width:200px}}
 .methodology{font-size:11px;color:#a8b6c8;line-height:1.7;padding:12px;border:1px solid #ffffff18;border-radius:6px;margin-bottom:20px}.methodology summary{cursor:pointer;color:#c0f578;font-weight:500}.methodology p{margin-top:10px}.methodology ul{padding-left:17px}.methodology li{margin-bottom:9px}.methodology a{color:#79caff}.analysis-series{margin-top:17px;border-top:1px solid #ffffff12}.analysis-series>svg{display:block;width:100%;margin:9px 0}.series-legend{display:flex;gap:14px;font-size:10px}.series-legend>span:last-child{margin-left:auto;color:#8998aa}.sun-key{color:#f2c76d}.earth-key{color:#79caff}.availability-row{display:flex;align-items:center;gap:10px;margin-top:8px;font-size:9px;color:#a8b6c8}.availability-row>span{width:31px;flex-shrink:0}.availability-row>svg{flex:1;min-width:0;height:12px}.series-dates{display:flex;justify-content:space-between;color:#8da0b8;font-size:8px;margin-top:10px}.analysis-series>p{font-size:9px;color:#8e9fb5;line-height:1.6;margin-top:10px}
 .report-reopen{font-size:9px;color:#c0f578;padding:5px 8px;line-height:1.5}
+
+/* UTC playback stays separate from camera controls. */
+.playback-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:16px 0 8px}
+.playback-heading time{font-size:14px;color:var(--text,#e7edf4);font-variant-numeric:tabular-nums}
+.playback-heading>span{font-size:11px;color:#9caabd}
+.time-slider{display:block;width:100%;padding:0;min-height:28px;accent-color:#c5ec8b;cursor:pointer}
+.playback-controls{display:flex;align-items:center;gap:8px;margin-top:16px;flex-wrap:wrap}
+.playback-controls button{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:9px 11px;background:#18212d;border:1px solid #334052;border-radius:7px;color:#e8eef6;min-height:38px}
+.playback-controls .playback-toggle{color:#d7f5ae;min-width:122px}
+.playback-controls label{display:flex;align-items:center;gap:8px;margin-left:auto;font-size:11px;color:#aab6c6}
+.playback-controls select{background:#121b27;color:#e8eef6;border:1px solid #334052;border-radius:7px;padding:9px}
+.playback-controls button:disabled,.time-slider:disabled{opacity:.45;cursor:not-allowed}
+@media(max-width:600px){.playback-heading{align-items:flex-start;flex-direction:column;gap:5px}.playback-controls label{width:100%;margin-left:0;justify-content:space-between}.timeline-labels{gap:12px}.timeline-labels time{font-size:9px}}

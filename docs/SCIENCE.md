@@ -59,7 +59,7 @@ La recomendación señala el mayor índice relativo entre candidatos (empates co
 - Eclipses, discos solares/terrestres extendidos, tiempo de luz y aberración. Un centro sobre el horizonte no garantiza que el disco esté completamente visible o que el Sol no esté eclipsado.
 - Estación terrestre concreta, rotación de su ubicación, disponibilidad DSN, radiofrecuencia, antenas, potencia, atmósfera terrestre y relés.
 - Energía generada, ángulo de paneles, batería, temperatura, pendiente y seguridad de aterrizaje.
-- Escena 3D: sigue siendo ilustrativa; las series numéricas del informe son la salida astronómica de esta versión.
+- Escena 3D: centros y distancias del Sol y de la Tierra sincronizados con el instante UTC, con la misma efeméride que las series del informe. Conversión a Three.js: (x, y, z) científico → (x, z, −y) / 1737,4. Terminador esférico mediante luz solar direccional; no incluye eclipses ni relieve. La luz ambiente, atmósfera, halo, estrellas y orientación de la textura terrestre son visuales, no resultados científicos.
 
 Antes de un análisis polar de precisión: DEM/LOLA, marco lunar y transformación cartográfica explícitos (p. ej. SPICE/MOON_ME), horizonte por azimut, tolerancias de navegación, eclipses y requisitos reales de misión.
 
