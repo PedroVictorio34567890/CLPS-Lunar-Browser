@@ -8,6 +8,7 @@ import type { CandidateSite, Coordinates } from '../models';
 import { geographicToCartesian, cartesianToGeographic } from '../lib/coordinates';
 import { Sun } from './Sun';
 import { Earth } from './Earth';
+import { SurfaceView } from './SurfaceView';
 import { sceneEphemeris } from '../science/sceneEphemeris';
 // Preserve the original camera distance, looking past the limb toward Earth.
 const INITIAL_CAMERA = new Vector3(-5, -0.6, 1.4).normalize().multiplyScalar(Math.hypot(3.2, 1.9, 3.8)).toArray();
@@ -65,7 +66,7 @@ function Moon({ sites, onSelect, canSelect }: { sites: CandidateSite[]; onSelect
     {sites.map(site => <PinLabel key={site.id} site={site}/>)}
   </group>;
 }
-export function MoonScene({ sites, onSelect, timestamp }: { sites: CandidateSite[]; onSelect: (c: Coordinates) => void; timestamp: number }) {
+export function MoonScene({ sites, onSelect, timestamp, surfaceSite }: { sites: CandidateSite[]; onSelect: (c: Coordinates) => void; timestamp: number; surfaceSite?: CandidateSite }) {
   const bodies = useMemo(() => sceneEphemeris(timestamp), [timestamp]);
   const [automatic, setAutomatic] = useState(true);
   const [resetKey, setResetKey] = useState(0);
@@ -73,7 +74,7 @@ export function MoonScene({ sites, onSelect, timestamp }: { sites: CandidateSite
   const multitouch = useRef(false);
   const gestureStart = useRef<[number, number]>([0, 0]);
   const dragged = useRef(false);
-  return <section className="scene" aria-label="Explorador lunar tridimensional">
+  return <section className={surfaceSite ? 'scene surface-mode' : 'scene'} aria-label="Explorador lunar tridimensional">
     <div className="scene-title"><div className="eyebrow">EXPLORADOR DE SUPERFICIE</div><h1>Un lugar para<br/><span>la próxima misión.</span></h1><p>Explora la Luna. Prepara tu comparación.</p></div>
     <div className="scene-status"><span className={automatic ? 'status-dot active' : 'status-dot'}/>{automatic ? 'Órbita automática de cámara' : 'Exploración manual'}</div>
     <div className="canvas-wrap" onPointerDownCapture={event => { if (!pointers.current.size) { multitouch.current = false; dragged.current = false; gestureStart.current = [event.clientX, event.clientY]; } pointers.current.add(event.pointerId); if (pointers.current.size > 1) multitouch.current = true; setAutomatic(false); }} onPointerMoveCapture={event => { if (pointers.current.size && Math.hypot(event.clientX - gestureStart.current[0], event.clientY - gestureStart.current[1]) > 4) dragged.current = true; }} onPointerUpCapture={event => pointers.current.delete(event.pointerId)} onPointerCancelCapture={event => { pointers.current.delete(event.pointerId); multitouch.current = true; }} onWheelCapture={() => setAutomatic(false)}>
@@ -81,10 +82,11 @@ export function MoonScene({ sites, onSelect, timestamp }: { sites: CandidateSite
         <ambientLight intensity={0.08}/><Sun position={bodies.sun}/><Stars/>
         <Suspense fallback={null}><Moon sites={sites} onSelect={onSelect} canSelect={() => !multitouch.current && !dragged.current}/></Suspense>
         <Suspense fallback={null}><Earth position={bodies.earth}/></Suspense>
-        <Controls automatic={automatic} resetKey={resetKey} onInteract={() => setAutomatic(false)}/>
+        <Controls automatic={automatic && !surfaceSite} resetKey={resetKey} onInteract={() => setAutomatic(false)}/>
       </Canvas></SceneBoundary>
     </div>
     <div className="scene-bottom"><div className="gesture-hint"><MousePointer2 size={15}/><span>Pulsa para marcar <b>·</b> Arrastra para orbitar <b>·</b> Rueda o pellizca para zoom</span></div><button className="reset-button" onClick={() => { setResetKey(k => k + 1); setAutomatic(true); }}><RotateCcw size={14}/> Restablecer vista</button></div>
     <div className="scene-caption"><span><ScanLine size={12}/> Tierra–Luna a escala real · efemérides UTC</span><span>Iluminación sobre esfera</span></div>
+    {surfaceSite && <SceneBoundary><SurfaceView key={surfaceSite.id + ':' + surfaceSite.latitude + ':' + surfaceSite.longitude} site={surfaceSite} timestamp={timestamp}/></SceneBoundary>}
   </section>;
 }

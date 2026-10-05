@@ -77,3 +77,9 @@ Referencias primarias:
 - [IAU WGCCRE 2015](https://astropedia.astrogeology.usgs.gov/download/Docs/WGCCRE/WGCCRE2015reprint.pdf): orientación de cuerpos y convenciones cartográficas.
 - [Manual de JPL Horizons](https://ssd.jpl.nasa.gov/horizons/manual.html): cantidades 14 y 15, punto subobservador y subsolar.
 - [NASA CGI Moon Kit](https://svs.gsfc.nasa.gov/4720/): radio de referencia LRO y separación entre textura visual y datos científicos.
+
+## Horizonte local del visor
+
+La vista de superficie resta la posición del observador esférico a cada vector selenocéntrico, y proyecta la línea de visión sobre la base local este/norte/vertical. Azimut = atan2(este, norte), normalizado a [0°, 360°); elevación = asin(vertical/distancia). El eje de cámara +X apunta al este, +Y a la vertical y −Z al norte. La distancia se expresa en radios lunares. Las pruebas comparan las elevaciones del visor con las del informe en múltiples fechas, longitudes y ambos polos.
+
+El observador tiene altura cero y el horizonte geométrico está a 0°. Una semiesfera inferior opaca enmascara la parte del cielo bajo ese plano; es una representación ideal, no una malla topográfica. La lectura de visibilidad usa el centro del cuerpo, igual que el informe, aunque la imagen pueda mostrar parte de su disco sobre el horizonte. No se modelan eclipses ni refracción. En los polos, el meridiano del candidato define la base de azimut; en cenit/nadir no existe un azimut único.

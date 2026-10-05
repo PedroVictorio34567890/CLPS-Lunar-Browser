@@ -36,6 +36,16 @@ Bajo la escena, la barra permite elegir cualquier instante del periodo sin ejecu
 
 La reproducción recorre el periodo; no modifica el informe ni su muestreo de cinco minutos. No calcula sombras locales: hará falta incorporar el DEM.
 
+## Vista desde una ubicación
+
+Añade un candidato y elígelo en «Desde la superficie». Se abre un cielo local visto desde altura cero sobre la esfera lunar, con horizonte ideal a 0°, puntos cardinales y lectura de azimut/elevación de los centros del Sol y la Tierra. Las posiciones se recalculan con el tiempo UTC; la cámara conserva la dirección de la mirada mientras el cielo evoluciona.
+
+Arrastra con ratón o un dedo; con el visor enfocado, las flechas giran la mirada en pasos de 5°. «Mirar hacia el Sol», «Mirar hacia la Tierra» y «Mirar al norte» orientan la cámara una vez (no seguimiento automático). «Acercar» y «Alejar» ajustan el campo de visión entre 20° y 80°, conservando las proporciones angulares. Los cuerpos bajo el horizonte se ocultan; un disco puede sobresalir parcialmente aunque su centro esté debajo.
+
+«Vista orbital» recupera la cámara orbital, que permanece montada y suspende su movimiento automático mientras está oculta. Editar o cambiar el lugar reinicia la mirada local; eliminar el candidato observado devuelve la vista orbital. En los polos exactos la longitud elegida define el meridiano de referencia; en el cenit/nadir el azimut aparece como indefinido.
+
+El suelo liso es una máscara visual del horizonte, no terreno NASA. No representa montañas, pendientes, sombras locales ni una altura de antena. Las lecturas coinciden con el modelo esférico del informe.
+
 ## Uso
 
 1. Pulsa la superficie de la Luna para colocar una ubicación o introduce latitud y longitud. Sur y oeste se expresan con signo negativo. Los campos admiten decimales; la lista redondea a tres decimales solo para mostrar, conservando la precisión de entrada.
@@ -86,7 +96,7 @@ La siguiente iteración debe incorporar un DEM polar y un horizonte dependiente 
 ## Verificación de esta entrega
 
 - TypeScript sin errores y compilación de producción Vite correcta.
-- Diecisiete pruebas automatizadas (incluidas coherencia escena/informe y límites de reproducción): dominio inicial, ocho fechas de referencia JPL, elevación topocéntrica, cruces de horizonte, intervalos parciales, una lunación con caras cercana/lejana, límites e índice exploratorio.
+- Diecinueve pruebas automatizadas (incluidas coherencia escena/informe y límites de reproducción): dominio inicial, ocho fechas de referencia JPL, elevación topocéntrica, cruces de horizonte, intervalos parciales, una lunación con caras cercana/lejana, límites e índice exploratorio.
 - Navegador: alta manual y por clic, edición, arrastre sin crear lugares, zoom con rueda, parada y restablecimiento de rotación, máximo de ocho por ambas vías, eliminación, intervalo invertido y acceso rápido, apertura y cierre del informe.
 - Revisión visual de escritorio y ancho móvil de 390 px, sin desbordamiento horizontal. Los gestos táctiles están configurados en OrbitControls, pero no se han probado en un dispositivo táctil físico.
 - Iteración 2 en producción: cálculo de dos candidatos durante 30 días con el worker compilado, reapertura del informe, invalidación al modificar el periodo y bloqueo por encima de 90 días; informe revisado en móvil, sin errores de consola.

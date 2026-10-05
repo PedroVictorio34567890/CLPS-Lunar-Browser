@@ -7,7 +7,7 @@ const MOON_RADIUS_KM = 1737.4;
 export const EARTH_RADIUS = 6371 / MOON_RADIUS_KM;
 
 
-export function Earth({ position }: { position: [number, number, number] }) {
+export function Earth({ position, showLabel = true }: { position: [number, number, number]; showLabel?: boolean }) {
   const map = useTexture('/textures/earth_atmos_2048.jpg');
   map.colorSpace = SRGBColorSpace;
   map.anisotropy = 8;
@@ -45,8 +45,8 @@ export function Earth({ position }: { position: [number, number, number] }) {
             gl_FragColor = vec4(0.2, 0.55, 1.0, rim * 0.55);
           }`}/>
     </mesh>
-    <sprite position={[0, -6.5, 0]} scale={[19, 4.75, 1]} raycast={() => null}>
+    {showLabel && <sprite position={[0, -6.5, 0]} scale={[19, 4.75, 1]} raycast={() => null}>
       <spriteMaterial map={label} transparent depthTest depthWrite={false} toneMapped={false}/>
-    </sprite>
+    </sprite>}
   </group>;
 }
