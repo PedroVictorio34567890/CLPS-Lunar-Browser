@@ -96,7 +96,19 @@ La siguiente iteración debe incorporar un DEM polar y un horizonte dependiente 
 ## Verificación de esta entrega
 
 - TypeScript sin errores y compilación de producción Vite correcta.
-- Diecinueve pruebas automatizadas (incluidas coherencia escena/informe y límites de reproducción): dominio inicial, ocho fechas de referencia JPL, elevación topocéntrica, cruces de horizonte, intervalos parciales, una lunación con caras cercana/lejana, límites e índice exploratorio.
+- Veintitrés pruebas automatizadas (incluidas coherencia escena/informe y límites de reproducción): dominio inicial, ocho fechas de referencia JPL, elevación topocéntrica, cruces de horizonte, intervalos parciales, una lunación con caras cercana/lejana, límites e índice exploratorio.
 - Navegador: alta manual y por clic, edición, arrastre sin crear lugares, zoom con rueda, parada y restablecimiento de rotación, máximo de ocho por ambas vías, eliminación, intervalo invertido y acceso rápido, apertura y cierre del informe.
 - Revisión visual de escritorio y ancho móvil de 390 px, sin desbordamiento horizontal. Los gestos táctiles están configurados en OrbitControls, pero no se han probado en un dispositivo táctil físico.
 - Iteración 2 en producción: cálculo de dos candidatos durante 30 días con el worker compilado, reapertura del informe, invalidación al modificar el periodo y bloqueo por encima de 90 días; informe revisado en móvil, sin errores de consola.
+
+## Requisitos de misión y prioridad de comunicaciones
+
+El panel 03 incorpora ejemplos editables, no requisitos NASA: interrupción máxima de 6 h, disponibilidad mínima del 90% y elevación terrestre mínima de 5°. Las entradas permiten otros límites, incluidos 0 h de interrupción y 100% de disponibilidad. Se valida que los números sean finitos, los porcentajes estén en [0,100] y la elevación en [0,90). El centro terrestre debe estar estrictamente por encima del umbral.
+
+El informe captura una copia de los requisitos al iniciar el cálculo. Si cambian los lugares, fechas o requisitos, hay que analizar de nuevo; el informe anterior no se presenta como vigente. La primera sección de cada lugar evalúa por separado disponibilidad e interrupción máxima, y solo indica cumplimiento geométrico si ambas pasan. Incluye la ventana continua más larga, una banda temporal y las interrupciones ordenadas por duración con fechas UTC. Los cortes en los extremos del periodo se identifican como recortados.
+
+La evaluación reutiliza las muestras de elevación de cinco minutos del motor y resta el umbral antes de interpolar cruces. Las cifras de referencia a 0° y el índice luz/visibilidad se mantienen identificados por separado; ese índice no evalúa requisitos de misión. No se modelan estaciones terrestres, relés, calidad de señal ni presupuesto de enlace, y el margen angular no sustituye el relieve.
+
+También se capturan consumo en operación/reposo, potencia nominal y modo de paneles, capacidad de batería, carga inicial y reserva. Son parámetros pendientes del balance energético; elegir panel fijo aún requiere definir su orientación y el modelo de generación. La carga inicial debe ser al menos la reserva. Los proyectos siguen siendo de sesión; recargar no guarda estos datos.
+
+Verificación: 23 pruebas, incluidas ventanas con umbral angular, límites inclusivos, cortes completos, referencia a 0°, validación y detección de requisitos modificados.

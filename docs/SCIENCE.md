@@ -83,3 +83,9 @@ Referencias primarias:
 La vista de superficie resta la posición del observador esférico a cada vector selenocéntrico, y proyecta la línea de visión sobre la base local este/norte/vertical. Azimut = atan2(este, norte), normalizado a [0°, 360°); elevación = asin(vertical/distancia). El eje de cámara +X apunta al este, +Y a la vertical y −Z al norte. La distancia se expresa en radios lunares. Las pruebas comparan las elevaciones del visor con las del informe en múltiples fechas, longitudes y ambos polos.
 
 El observador tiene altura cero y el horizonte geométrico está a 0°. Una semiesfera inferior opaca enmascara la parte del cielo bajo ese plano; es una representación ideal, no una malla topográfica. La lectura de visibilidad usa el centro del cuerpo, igual que el informe, aunque la imagen pueda mostrar parte de su disco sobre el horizonte. No se modelan eclipses ni refracción. En los polos, el meridiano del candidato define la base de azimut; en cenit/nadir no existe un azimut único.
+
+## Evaluación de requisitos de comunicaciones
+
+La evaluación de misión es una capa posterior al cálculo astronómico. Para cada muestra se usa elevación terrestre menos el mínimo configurado y se aplica la misma integración temporal e interpolación de cruces. Se evalúan disponibilidad ≥ mínimo e interrupción máxima ≤ tolerancia, sin redondear los resultados mostrados y con tolerancia numérica de 1e-9 en porcentaje/horas. El umbral se refiere al centro terrestre y debe superarse estrictamente; no define la visibilidad de una estación concreta.
+
+Las bandas del bloque de requisitos emplean el umbral de misión. Las curvas y métricas astronómicas de referencia conservan 0°, explícitamente identificadas. Los intervalos se recortan al periodo, se listan de mayor a menor duración y no acreditan viabilidad de radio o energética. La copia de parámetros queda asociada al informe para evitar reinterpretarlo después de modificar los requisitos.
