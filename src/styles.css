@@ -68,3 +68,17 @@
 .communication-assessment li{padding:8px 0}.communication-assessment li span,.communication-assessment li small{display:block;font-size:10px;color:#a7b7c9;line-height:1.7}
 @media(max-width:540px){.requirement-line{flex-direction:column;gap:5px}.requirement-line strong{text-align:left}}
 @media(min-width:761px) and (max-height:800px){.scene-title p{display:none}}
+
+/* Compact scene heading lets the Moon remain the visual focus. */
+.scene-title{top:22px;left:26px;max-width:230px}
+.scene-title .eyebrow{font-size:8px;letter-spacing:1.25px;color:#7f8b9b}
+.scene-title h1{font-size:clamp(18px,1.4vw,22px);line-height:1.3;letter-spacing:-.35px;margin-top:7px;color:#bac4d1}
+.scene-title h1>span{color:#8895a7}
+.scene-title p{font-size:10px;line-height:1.5;margin-top:7px;color:#7f8b9b}
+.language-menu{display:inline-flex;align-items:center;gap:6px;flex-shrink:0;color:#aebccc}
+.language-menu select{font:inherit;font-size:11px;color:#e1e5ed;background:#111a25;border:1px solid #ffffff25;border-radius:6px;padding:8px 25px 8px 9px;cursor:pointer;min-height:36px}
+select:focus-visible{outline:2px solid var(--lime);outline-offset:3px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.report-language{display:flex;justify-content:flex-end;margin-bottom:15px}
+@media(max-width:1000px){.header-context{display:none}.topbar{gap:14px}.challenge{font-size:9px}.language-menu select{padding-right:7px}}
+@media(max-width:540px){.topbar{padding:0 14px;gap:10px;flex-wrap:wrap;height:auto;min-height:72px;padding-top:12px;padding-bottom:12px}.topbar>.language-menu{margin-left:auto}.challenge{display:none}.scene-title{left:22px;top:20px;max-width:210px}.scene-title h1{font-size:19px}.scene-title p{font-size:9px}.scene-status{top:125px}.playback-controls{gap:6px}.playback-controls button{padding:8px}.timeline-heading{flex-wrap:wrap}.surface-heading>span{line-height:1.5}}

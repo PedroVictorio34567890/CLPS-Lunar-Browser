@@ -1,3 +1,4 @@
+import { t, useLanguage } from '../i18n';
 import { Component, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode, ComponentRef } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
@@ -15,15 +16,17 @@ const INITIAL_CAMERA = new Vector3(-5, -0.6, 1.4).normalize().multiplyScalar(Mat
 class SceneBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
   state = { failed: false };
   static getDerivedStateFromError() { return { failed: true }; }
-  render() { return this.state.failed ? <div className="scene-fallback"><AlertTriangle/><strong>No se pudo cargar la escena 3D.</strong><span>Comprueba WebGL y recarga la página. Puedes seguir usando las coordenadas manuales.</span></div> : this.props.children; }
+  render() { return this.state.failed ? <div className="scene-fallback"><AlertTriangle/><strong>{t("No se pudo cargar la escena 3D.")}</strong><span>{t("Comprueba WebGL y recarga la página. Puedes seguir usando las coordenadas manuales.")}</span></div> : this.props.children; }
 }
 function Controls({ automatic, resetKey, onInteract }: { automatic: boolean; resetKey: number; onInteract: () => void }) {
+  useLanguage();
   const controls = useRef<ComponentRef<typeof OrbitControls>>(null);
   const camera = useThree(state => state.camera);
   useEffect(() => { if (controls.current) { controls.current.reset(); camera.position.set(...INITIAL_CAMERA); controls.current.target.set(0, 0, 0); controls.current.update(); } }, [resetKey, camera]);
   return <OrbitControls ref={controls} makeDefault enablePan={false} autoRotate={automatic} autoRotateSpeed={0.22} enableDamping dampingFactor={0.07} rotateSpeed={0.5} zoomSpeed={0.65} minDistance={1.65} maxDistance={8} onStart={onInteract} mouseButtons={{ LEFT: MOUSE.ROTATE, MIDDLE: MOUSE.DOLLY, RIGHT: MOUSE.ROTATE }} touches={{ ONE: TOUCH.ROTATE, TWO: TOUCH.DOLLY_ROTATE }}/>;
 }
 function Stars() {
+  useLanguage();
   const positions = useMemo(() => {
     let seed = 43;
     const random = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
@@ -32,6 +35,7 @@ function Stars() {
   return <points><bufferGeometry><bufferAttribute attach="attributes-position" args={[positions, 3]}/></bufferGeometry><pointsMaterial color="#a7b4ca" size={0.07 * 200000 / 65} sizeAttenuation transparent opacity={0.65}/></points>;
 }
 function PinLabel({ site }: { site: CandidateSite }) {
+  useLanguage();
   const texture = useMemo(() => {
     const canvas = document.createElement('canvas'); canvas.width = 96; canvas.height = 96;
     const ctx = canvas.getContext('2d')!;
@@ -44,6 +48,7 @@ function PinLabel({ site }: { site: CandidateSite }) {
   return <sprite position={geographicToCartesian(site, 1.065)} scale={[0.045, 0.045, 1]} raycast={() => null}><spriteMaterial map={texture} sizeAttenuation={false} depthTest transparent toneMapped={false}/></sprite>;
 }
 function Moon({ sites, onSelect, canSelect }: { sites: CandidateSite[]; onSelect: (c: Coordinates) => void; canSelect: () => boolean }) {
+  useLanguage();
   const mesh = useRef<Mesh>(null!);
   const map = useTexture('/textures/lroc_color_2k.jpg');
   map.colorSpace = SRGBColorSpace;
@@ -67,6 +72,7 @@ function Moon({ sites, onSelect, canSelect }: { sites: CandidateSite[]; onSelect
   </group>;
 }
 export function MoonScene({ sites, onSelect, timestamp, surfaceSite }: { sites: CandidateSite[]; onSelect: (c: Coordinates) => void; timestamp: number; surfaceSite?: CandidateSite }) {
+  useLanguage();
   const bodies = useMemo(() => sceneEphemeris(timestamp), [timestamp]);
   const [automatic, setAutomatic] = useState(true);
   const [resetKey, setResetKey] = useState(0);
@@ -74,19 +80,19 @@ export function MoonScene({ sites, onSelect, timestamp, surfaceSite }: { sites: 
   const multitouch = useRef(false);
   const gestureStart = useRef<[number, number]>([0, 0]);
   const dragged = useRef(false);
-  return <section className={surfaceSite ? 'scene surface-mode' : 'scene'} aria-label="Explorador lunar tridimensional">
-    <div className="scene-title"><div className="eyebrow">EXPLORADOR DE SUPERFICIE</div><h1>Un lugar para<br/><span>la próxima misión.</span></h1><p>Explora la Luna. Prepara tu comparación.</p></div>
-    <div className="scene-status"><span className={automatic ? 'status-dot active' : 'status-dot'}/>{automatic ? 'Órbita automática de cámara' : 'Exploración manual'}</div>
+  return <section className={surfaceSite ? 'scene surface-mode' : 'scene'} aria-label={t("Explorador lunar tridimensional")}>
+    <div className="scene-title"><div className="eyebrow">{t("EXPLORADOR DE SUPERFICIE")}</div><h1>{t("Un lugar para")}<br/><span>{t("la próxima misión.")}</span></h1><p>{t("Explora la Luna. Prepara tu comparación.")}</p></div>
+    <div className="scene-status"><span className={automatic ? 'status-dot active' : 'status-dot'}/>{automatic ? t("Órbita automática de cámara") : t("Exploración manual")}</div>
     <div className="canvas-wrap" onPointerDownCapture={event => { if (!pointers.current.size) { multitouch.current = false; dragged.current = false; gestureStart.current = [event.clientX, event.clientY]; } pointers.current.add(event.pointerId); if (pointers.current.size > 1) multitouch.current = true; setAutomatic(false); }} onPointerMoveCapture={event => { if (pointers.current.size && Math.hypot(event.clientX - gestureStart.current[0], event.clientY - gestureStart.current[1]) > 4) dragged.current = true; }} onPointerUpCapture={event => pointers.current.delete(event.pointerId)} onPointerCancelCapture={event => { pointers.current.delete(event.pointerId); multitouch.current = true; }} onWheelCapture={() => setAutomatic(false)}>
-      <SceneBoundary><Canvas camera={{ position: INITIAL_CAMERA, fov: 33, near: 0.1, far: 300000 }} dpr={[1, 1.75]} gl={{ antialias: true }} fallback={<div className="scene-fallback">WebGL no está disponible. Usa el formulario de coordenadas.</div>}>
+      <SceneBoundary><Canvas camera={{ position: INITIAL_CAMERA, fov: 33, near: 0.1, far: 300000 }} dpr={[1, 1.75]} gl={{ antialias: true }} fallback={<div className="scene-fallback">{t("WebGL no está disponible. Usa el formulario de coordenadas.")}</div>}>
         <ambientLight intensity={0.08}/><Sun position={bodies.sun}/><Stars/>
         <Suspense fallback={null}><Moon sites={sites} onSelect={onSelect} canSelect={() => !multitouch.current && !dragged.current}/></Suspense>
         <Suspense fallback={null}><Earth position={bodies.earth}/></Suspense>
         <Controls automatic={automatic && !surfaceSite} resetKey={resetKey} onInteract={() => setAutomatic(false)}/>
       </Canvas></SceneBoundary>
     </div>
-    <div className="scene-bottom"><div className="gesture-hint"><MousePointer2 size={15}/><span>Pulsa para marcar <b>·</b> Arrastra para orbitar <b>·</b> Rueda o pellizca para zoom</span></div><button className="reset-button" onClick={() => { setResetKey(k => k + 1); setAutomatic(true); }}><RotateCcw size={14}/> Restablecer vista</button></div>
-    <div className="scene-caption"><span><ScanLine size={12}/> Tierra–Luna a escala real · efemérides UTC</span><span>Iluminación sobre esfera</span></div>
+    <div className="scene-bottom"><div className="gesture-hint"><MousePointer2 size={15}/><span>{t("Pulsa para marcar")} <b>·</b>  {t("Arrastra para orbitar")} <b>·</b>  {t("Rueda o pellizca para zoom")}</span></div><button className="reset-button" onClick={() => { setResetKey(k => k + 1); setAutomatic(true); }}><RotateCcw size={14}/>  {t("Restablecer vista")}</button></div>
+    <div className="scene-caption"><span><ScanLine size={12}/>  {t("Tierra–Luna a escala real · efemérides UTC")}</span><span>{t("Iluminación sobre esfera")}</span></div>
     {surfaceSite && <SceneBoundary><SurfaceView key={surfaceSite.id + ':' + surfaceSite.latitude + ':' + surfaceSite.longitude} site={surfaceSite} timestamp={timestamp}/></SceneBoundary>}
   </section>;
 }
