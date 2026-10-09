@@ -235,3 +235,33 @@ export const english: Record<string, string> = {
   'Se necesitan al menos dos muestras.': 'At least two samples are required.',
   'Serie temporal inválida.': 'Invalid time series.',
 };
+
+Object.assign(english, {
+  'Energía · balance de batería': 'Energy · battery balance',
+  'Tiempo en operación (%)': 'Operating duty cycle (%)',
+  'Factor de generación útil (%)': 'Useful generation factor (%)',
+  'Inclinación del panel (°)': 'Panel tilt (°)',
+  'Azimut del panel (°)': 'Panel azimuth (°)',
+  'Inclinación entre 0° y 90°; azimut entre 0° y menos de 360°.': 'Tilt must be between 0° and 90°; azimuth between 0° and less than 360°.',
+  'Consumo medio constante. El resto del tiempo usa consumo en reposo. Factor útil: 100% sin pérdidas de generación; batería ideal. Panel fijo: 0° horizontal, 90° vertical; azimut N=0°, E=90°.': 'Constant average load. The remaining time uses standby power. Useful factor: 100% means no generation losses; ideal battery. Fixed panel: 0° horizontal, 90° vertical; azimuth N=0°, E=90°.',
+  'Balance energético': 'Energy balance',
+  'Energía insuficiente para la demanda': 'Insufficient energy for the demand',
+  'Mantiene la reserva en el modelo': 'Maintains reserve in the model',
+  'Cubre la demanda, pero baja de la reserva': 'Meets demand but falls below reserve',
+  'Consumo medio': 'Average load', 'Carga mínima': 'Minimum charge', 'Carga final': 'Final charge',
+  'Energía generada': 'Energy generated', 'Demanda total': 'Total demand', 'Demanda sin cubrir': 'Unserved demand',
+  'Excedente no almacenado': 'Unstored surplus', 'Carga de batería (%)': 'Battery charge (%)',
+  'Evolución de carga y línea de reserva': 'Battery charge over time and reserve line',
+  'Primera caída bajo reserva': 'First reserve violation', 'Primera batería vacía': 'First empty battery',
+  'No detectada': 'Not detected', 'Intervalos con demanda sin cubrir': 'Intervals with unserved demand',
+  'Hipótesis del balance': 'Energy balance assumptions',
+  'Consumo medio constante según el porcentaje de operación; no es un horario de actividades. La reserva avisa, pero no desconecta cargas.': 'Constant average load based on duty cycle, not an activity schedule. Reserve is a warning threshold and does not disconnect loads.',
+  'Batería ideal: sin límites de potencia, pérdidas de carga, degradación ni temperatura. La generación usa el factor configurado, sin relieve, eclipses ni variación de distancia solar.': 'Ideal battery: no power limits, charging losses, degradation or temperature effects. Generation uses the configured factor, without terrain, eclipses or solar distance variation.',
+  'Panel fijo: inclinación desde la horizontal y azimut desde el norte hacia el este. Seguimiento: incidencia normal ideal cuando el centro solar supera 0°.': 'Fixed panel: tilt from horizontal and azimuth clockwise from north. Tracking: ideal normal incidence when the solar center is above 0°.',
+  'Integración por tramos de hasta 5 min, divididos en los cruces del horizonte. Potencia solar evaluada en el punto medio. Los eventos son estimaciones dentro del periodo.': 'Integration in intervals up to 5 min, split at horizon crossings. Solar power evaluated at the midpoint. Events are estimates within the selected period.',
+  'La disponibilidad geométrica de comunicaciones no garantiza que haya energía para operar la radio.': 'Geometric communications availability does not guarantee power to operate the radio.',
+  'Energía: operación': 'Energy: operating load', 'fijos': 'fixed', 'Operación': 'Operation', 'Factor útil': 'Useful factor', 'Inclinación': 'Tilt', 'Azimut': 'Azimuth',
+  'Revisa conjuntamente comunicaciones y balance energético. Antes de elegir, valida relieve, estaciones, enlace de radio y comportamiento real de la batería.': 'Review communications and energy balance together. Before selecting a site, validate terrain, stations, radio link and actual battery performance.',
+  'Geometría sin eclipses, tamaño angular de discos, atmósfera terrestre, relés ni antenas. La energía, si hay requisitos, se evalúa por separado con batería ideal.': 'Geometry excludes eclipses, angular disk sizes, Earth atmosphere, relays and antennas. When requirements are provided, energy is evaluated separately with an ideal battery.',
+  'Falta el azimut solar para el panel fijo.': 'Solar azimuth is missing for the fixed panel.'
+});

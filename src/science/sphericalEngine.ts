@@ -6,10 +6,15 @@ import { periodError, utcMillis } from '../lib/period.ts';
 import { elevation, lunarEphemeris } from './ephemeris.ts';
 import { exploratoryScore, visibilityStatistics } from './statistics.ts';
 
+import { localSky } from './localSky.ts';
+import { simulateEnergy } from './energy.ts';
+import { missionError } from '../lib/mission.ts';
 export const STEP_MINUTES = 5;
 const metric = (value: number): Metric => ({ status: 'calculated', value });
 export const sphericalEngine: ScienceEngine = {
-  async compare(inputSites, inputPeriod) {
+  async compare(inputSites, inputPeriod, inputMission) {
+    const mission = inputMission ? { ...inputMission } : undefined;
+    if (mission && missionError(mission)) throw new Error(missionError(mission)!);
     const sites = inputSites.map(site => ({ ...site }));
     const period = { ...inputPeriod };
     const invalidPeriod = periodError(period);
@@ -22,10 +27,10 @@ export const sphericalEngine: ScienceEngine = {
     for (let index = 0; index <= steps; index++) {
       const time = Math.min(end, start + index * STEP_MINUTES * 60000);
       const { sun, earth } = lunarEphemeris(time);
-      sites.forEach((site, i) => series[i].push({ time, sun: elevation(site, sun), earth: elevation(site, earth) }));
+      sites.forEach((site, i) => series[i].push({ time, sun: elevation(site, sun), earth: elevation(site, earth), sunAzimuth: localSky(site, sun).azimuth }));
     }
     const report: ComparisonReport = {
-      engine: 'spherical-v1', period,
+      engine: 'spherical-v1', period, mission,
       methodology: {
         ephemeris: 'Astronomy Engine 2.1.19 · orientación lunar IAU analítica',
         stepMinutes: STEP_MINUTES, sampleCount: steps + 1,
@@ -34,7 +39,7 @@ export const sphericalEngine: ScienceEngine = {
           'Esfera de radio 1737,4 km, altura del observador 0 m y horizonte plano a 0°. Sin DEM, pendientes ni sombras de cráteres o montañas.',
           'Luz: centro del Sol por encima de 0°. Comunicación: centro de la Tierra por encima de 0°; no representa una estación terrestre ni garantiza un enlace de radio.',
           'Vectores geométricos simultáneos J2000 convertidos al marco lunar IAU; UTC de entrada y conversión interna a TT. Sin correcciones de tiempo de luz ni aberración.',
-          'No se modelan eclipses, tamaño angular de los discos, atmósfera terrestre, relés, antenas, potencia ni baterías.',
+          'Geometría sin eclipses, tamaño angular de discos, atmósfera terrestre, relés ni antenas. La energía, si hay requisitos, se evalúa por separado con batería ideal.',
           'Cruces de horizonte interpolados entre muestras de 5 min. Eventos más cortos pueden omitirse; no equivale a una precisión científica de 5 min.',
           'Las duraciones continuas están recortadas al periodo seleccionado; pueden prolongarse fuera de él.',
         ],
@@ -45,7 +50,7 @@ export const sphericalEngine: ScienceEngine = {
         const communication = visibilityStatistics(samples.map(s => ({ time: s.time, altitude: s.earth })));
         const nearHorizon = samples.some(s => Math.abs(s.sun) < 1 || Math.abs(s.earth) < 1);
         return {
-          site,
+          site, energy: mission ? simulateEnergy(samples, mission) : undefined,
           sunlightPercent: metric(light.percent), longestLightHours: metric(light.longestVisibleHours), longestDarkHours: metric(light.longestHiddenHours),
           earthVisibilityPercent: metric(communication.percent), longestCommunicationOutageHours: metric(communication.longestHiddenHours),
           viabilityScore: metric(exploratoryScore(light.percent, communication.percent)),

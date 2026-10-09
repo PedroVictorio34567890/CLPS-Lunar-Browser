@@ -1,7 +1,7 @@
-import type { AnalysisPeriod, CandidateSite, ComparisonReport } from '../models.ts';
+import type { AnalysisPeriod, CandidateSite, ComparisonReport, MissionRequirements } from '../models.ts';
 import { isSouthPolar } from '../lib/coordinates.ts';
 import { periodError } from '../lib/period.ts';
-export interface ScienceEngine { compare(sites: CandidateSite[], period: AnalysisPeriod): Promise<ComparisonReport> }
+export interface ScienceEngine { compare(sites: CandidateSite[], period: AnalysisPeriod, mission?: MissionRequirements): Promise<ComparisonReport> }
 // Replace only this adapter when ephemerides and a terrain model are available.
 export const pendingEngine: ScienceEngine = {
   async compare(sites, period) {

@@ -3,7 +3,7 @@ import type { ComparisonReport } from '../models';
 
 // Computation never blocks the orbit controls or form interactions.
 export const workerEngine: ScienceEngine = {
-  compare(sites, period) {
+  compare(sites, period, mission) {
     return new Promise((resolve, reject) => {
       const worker = new Worker(new URL('./science.worker.ts', import.meta.url), { type: 'module' });
       const fail = (message: string) => { worker.terminate(); reject(new Error(message)); };
@@ -14,7 +14,7 @@ export const workerEngine: ScienceEngine = {
         if (event.data.report) resolve(event.data.report);
         else reject(new Error(event.data.error ?? 'Respuesta de cálculo inválida.'));
       };
-      worker.postMessage({ sites, period });
+      worker.postMessage({ sites, period, mission });
     });
   },
 };

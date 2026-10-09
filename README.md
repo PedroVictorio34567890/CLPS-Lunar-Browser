@@ -85,18 +85,18 @@ La región 80° S–90° S es un **umbral de interfaz elegido para esta iteraci�
 
 **Hay cálculos astronómicos geométricos, no resultados de demostración.** Astronomy Engine 2.1.19 aporta posiciones y orientación lunar. Se muestrea cada cinco minutos incluyendo exactamente los extremos, con cruces del horizonte interpolados. La luz y la comunicación se definen por el centro del Sol y de la Tierra sobre 0° de elevación, respectivamente. Se calculan porcentajes temporales, periodos continuos máximos y un índice exploratorio `0,5 × luz (%) + 0,5 × visibilidad terrestre (%)`.
 
-El modelo utiliza una esfera de 1737,4 km y altura de observador cero. **No incluye relieve, eclipses, discos extendidos, estaciones terrestres, presupuesto de enlace ni baterías.** El índice pondera disponibilidades medias, no la longitud de las interrupciones, y no certifica viabilidad de misión. Todas estas limitaciones aparecen en el informe. Las duraciones están recortadas al periodo elegido. El muestreo de cinco minutos no implica una precisión científica de cinco minutos.
+El modelo utiliza una esfera de 1737,4 km y altura de observador cero. **No incluye relieve, eclipses, discos extendidos, estaciones terrestres, presupuesto de enlace. La energía se evalúa por separado con una batería ideal.** El índice pondera disponibilidades medias, no la longitud de las interrupciones, y no certifica viabilidad de misión. Todas estas limitaciones aparecen en el informe. Las duraciones están recortadas al periodo elegido. El muestreo de cinco minutos no implica una precisión científica de cinco minutos.
 
 La formulación, referencias y validación están documentadas en [docs/SCIENCE.md](docs/SCIENCE.md). `pendingEngine` permanece como adaptador explícito de la primera versión y no se utiliza en el flujo de la aplicación.
 
 La textura del [CGI Moon Kit de NASA SVS](https://svs.gsfc.nasa.gov/4720/) y la textura terrestre de los ejemplos de Three.js se distribuyen localmente con créditos en `public/textures/README.md`. Son recursos visuales, no DEM. La escena representa las posiciones geométricas y la iluminación esférica del instante UTC elegido, con distancias y tamaños a escala. El aspecto fotométrico y las texturas son aproximaciones visuales. Las fuentes tipográficas se solicitan a Google Fonts con sustitutos locales si no hay conexión; la escena y sus texturas no dependen de un servicio externo en ejecución.
 
-La siguiente iteración debe incorporar un DEM polar y un horizonte dependiente del azimut, validar marcos cartográficos de mayor precisión, modelar eclipses y definir requisitos de energía y telecomunicaciones por misión. La escena y la reproducción temporal ya comparten las efemérides del informe; queda pendiente incorporar el relieve en ambas representaciones.
+La siguiente iteración debe incorporar un DEM polar y un horizonte dependiente del azimut, validar marcos cartográficos de mayor precisión, modelar eclipses y refinar los modelos de energía y telecomunicaciones con requisitos reales de misión. La escena y la reproducción temporal ya comparten las efemérides del informe; queda pendiente incorporar el relieve en ambas representaciones.
 
 ## Verificación de esta entrega
 
 - TypeScript sin errores y compilación de producción Vite correcta.
-- Veintitrés pruebas automatizadas (incluidas coherencia escena/informe y límites de reproducción): dominio inicial, ocho fechas de referencia JPL, elevación topocéntrica, cruces de horizonte, intervalos parciales, una lunación con caras cercana/lejana, límites e índice exploratorio.
+- Treinta y una pruebas automatizadas (incluidas coherencia escena/informe y límites de reproducción): dominio inicial, ocho fechas de referencia JPL, elevación topocéntrica, cruces de horizonte, intervalos parciales, una lunación con caras cercana/lejana, límites e índice exploratorio.
 - Navegador: alta manual y por clic, edición, arrastre sin crear lugares, zoom con rueda, parada y restablecimiento de rotación, máximo de ocho por ambas vías, eliminación, intervalo invertido y acceso rápido, apertura y cierre del informe.
 - Revisión visual de escritorio y ancho móvil de 390 px, sin desbordamiento horizontal. Los gestos táctiles están configurados en OrbitControls, pero no se han probado en un dispositivo táctil físico.
 - Iteración 2 en producción: cálculo de dos candidatos durante 30 días con el worker compilado, reapertura del informe, invalidación al modificar el periodo y bloqueo por encima de 90 días; informe revisado en móvil, sin errores de consola.
@@ -109,6 +109,18 @@ El informe captura una copia de los requisitos al iniciar el cálculo. Si cambia
 
 La evaluación reutiliza las muestras de elevación de cinco minutos del motor y resta el umbral antes de interpolar cruces. Las cifras de referencia a 0° y el índice luz/visibilidad se mantienen identificados por separado; ese índice no evalúa requisitos de misión. No se modelan estaciones terrestres, relés, calidad de señal ni presupuesto de enlace, y el margen angular no sustituye el relieve.
 
-También se capturan consumo en operación/reposo, potencia nominal y modo de paneles, capacidad de batería, carga inicial y reserva. Son parámetros pendientes del balance energético; elegir panel fijo aún requiere definir su orientación y el modelo de generación. La carga inicial debe ser al menos la reserva. Los proyectos siguen siendo de sesión; recargar no guarda estos datos.
+El balance energético utiliza consumo en operación/reposo, porcentaje de operación, potencia nominal y factor útil de generación, capacidad de batería, carga inicial y reserva. Admite seguimiento solar ideal o panel fijo con inclinación y azimut. Muestra la curva de carga, mínimos, energía generada, demanda sin cubrir, excedente, caída bajo reserva y periodos sin energía suficiente. La reserva es una alerta: no desconecta cargas. La carga inicial debe ser al menos la reserva. Los proyectos siguen siendo de sesión; recargar no guarda estos datos.
 
-Verificación: 23 pruebas, incluidas ventanas con umbral angular, límites inclusivos, cortes completos, referencia a 0°, validación y detección de requisitos modificados.
+Verificación: 31 pruebas, incluidas descarga, recarga, conservación de energía, cruces solares, orientación de paneles, idiomas y ventanas con umbral angular, límites inclusivos, cortes completos, referencia a 0°, validación y detección de requisitos modificados.
+
+## Tutorial de bienvenida
+
+La aplicación abre una guía de diez temas, en español e inglés, con explicaciones de los controles, unidades, ejemplos y lectura del informe. Anterior/Siguiente y un índice permiten recorrerla o consultar un tema. Se puede cerrar con la X, Salir del tutorial o Escape; Tutorial, en la cabecera, la reinicia sin modificar los datos. Abrirla pausa la reproducción temporal.
+
+Por defecto aparece en cada apertura. No mostrar al abrir guarda una preferencia local en este navegador; desmarcarla vuelve a activar la apertura automática. Si el navegador bloquea el almacenamiento, se informa y la guía sigue funcionando. El diálogo mantiene el foco de teclado, devuelve el foco al cerrar y adapta sus controles a pantallas pequeñas. Esta preferencia no guarda los datos de la misión.
+
+## Comunicaciones con energía
+
+El informe muestra ahora las ventanas en las que coinciden acceso geométrico a la Tierra y alimentación completa del consumo medio configurado. Incluye disponibilidad conjunta, corte más largo, horas perdidas por déficit energético y una cronología con causas. Usa los umbrales de comunicaciones de la misión. No certifica un enlace de radio ni supone que la reserva desconecte equipos. La explicación también está incorporada al tutorial.
+
+Verificación actual: 35 pruebas automatizadas, TypeScript y compilación de producción.

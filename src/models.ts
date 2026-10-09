@@ -12,9 +12,20 @@ export interface MissionRequirements {
   batteryWh: number;
   initialChargePercent: number;
   reservePercent: number;
+  operatingDutyPercent: number;
+  generationFactorPercent: number;
+  panelTiltDeg: number;
+  panelAzimuthDeg: number;
 }
 export type Metric = { status: 'pending'; value: null } | { status: 'calculated'; value: number };
-export interface ElevationSample { time: number; sun: number; earth: number }
+export interface ElevationSample { time: number; sun: number; earth: number; sunAzimuth?: number | null }
+export interface EnergyReport {
+  samples: { time: number; chargeWh: number }[];
+  generatedWh: number; demandWh: number; spilledWh: number; unservedWh: number;
+  minChargeWh: number; finalChargeWh: number; loadW: number;
+  firstReserveViolation: number | null; firstEmpty: number | null;
+  outages: { start: number; end: number }[];
+}
 export interface VisibilityWindow { start: number; end: number; visible: boolean }
 export interface SiteSeries {
   samples: ElevationSample[];
@@ -22,6 +33,7 @@ export interface SiteSeries {
   earthVisibility: VisibilityWindow[];
 }
 export interface SiteReport {
+  energy?: EnergyReport;
   site: CandidateSite;
   sunlightPercent: Metric;
   longestLightHours: Metric;

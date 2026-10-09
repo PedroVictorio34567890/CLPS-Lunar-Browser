@@ -82,3 +82,32 @@ select:focus-visible{outline:2px solid var(--lime);outline-offset:3px}
 .report-language{display:flex;justify-content:flex-end;margin-bottom:15px}
 @media(max-width:1000px){.header-context{display:none}.topbar{gap:14px}.challenge{font-size:9px}.language-menu select{padding-right:7px}}
 @media(max-width:540px){.topbar{padding:0 14px;gap:10px;flex-wrap:wrap;height:auto;min-height:72px;padding-top:12px;padding-bottom:12px}.topbar>.language-menu{margin-left:auto}.challenge{display:none}.scene-title{left:22px;top:20px;max-width:210px}.scene-title h1{font-size:19px}.scene-title p{font-size:9px}.scene-status{top:125px}.playback-controls{gap:6px}.playback-controls button{padding:8px}.timeline-heading{flex-wrap:wrap}.surface-heading>span{line-height:1.5}}
+
+.energy-assessment{border:1px solid #b9e89144;border-radius:7px;background:#101b20;padding:14px;margin:20px 0}
+.energy-assessment .requirement-result{font-size:13px;font-weight:600}
+.energy-assessment>p,.energy-assessment details p{font-size:10px;line-height:1.7;margin:10px 0;color:#a9bacb}
+.energy-assessment summary{font-size:11px;cursor:pointer;padding:8px 0;color:#c6d8e7}
+.energy-assessment ul{font-size:10px;line-height:1.8;max-height:180px;overflow:auto;padding-left:16px}
+.battery-plot{margin:16px 0;position:relative;padding-left:28px}
+.battery-plot figcaption{font-size:10px;margin-bottom:10px;color:#b9e891}
+.battery-plot svg{display:block;width:100%;height:120px}
+.battery-scale{position:absolute;top:24px;bottom:28px;left:0;display:flex;flex-direction:column;justify-content:space-between;font-size:8px;color:#acbbcd}
+.battery-dates{display:flex;justify-content:space-between;gap:12px;font-size:8px;color:#91a2b8;margin-top:8px}
+
+/* A keyboard-accessible, replayable introduction with an independent scroll area. */
+.tutorial-launch{padding:9px 12px;color:var(--lime);flex-shrink:0;min-height:40px}
+.tutorial-dialog{padding:0;width:min(1000px,calc(100vw - 32px));max-width:none;height:min(780px,calc(100dvh - 32px));max-height:none;border:1px solid #435443;border-radius:16px;background:#101720;color:#e1e5ed;box-shadow:0 24px 100px #0009;overflow:hidden}
+.tutorial-dialog[open]{display:flex;flex-direction:column}
+.tutorial-dialog::backdrop{background:#03070cd9;backdrop-filter:blur(5px)}
+.tutorial-header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 24px;border-bottom:1px solid var(--line);flex-shrink:0}
+.tutorial-header>span,.tutorial-header>div{display:flex;align-items:center;gap:12px}.tutorial-header>span{font-weight:600;color:var(--lime)}
+.tutorial-layout{display:grid;grid-template-columns:245px minmax(0,1fr);min-height:0;flex:1}
+.tutorial-index{padding:16px 12px;overflow:auto;border-right:1px solid var(--line);background:#0c121a}
+.tutorial-index button{display:flex;justify-content:flex-start;text-align:left;width:100%;gap:10px;padding:11px 10px;line-height:1.5;border-color:transparent;font-size:12px;margin-bottom:4px}
+.tutorial-index button>span{color:#93a380;font-variant-numeric:tabular-nums}.tutorial-index button[aria-current]{background:#c0f57812;border-color:#c0f57855;color:var(--lime)}
+.tutorial-body{padding:28px 32px;overflow:auto;overscroll-behavior:contain}.tutorial-progress{font-size:12px;color:#acbf9b;line-height:1.6}.tutorial-body progress{display:block;width:100%;height:4px;margin:12px 0 22px;accent-color:var(--lime)}
+.tutorial-body h2{font:600 clamp(22px,3vw,30px)/1.25 'Space Grotesk',sans-serif;scroll-margin-top:20px}.tutorial-body h2:focus{outline:none}.tutorial-intro{margin-top:14px;color:#b9c7d5;font-size:15px;line-height:1.7}.tutorial-body dl{margin:22px 0 0}.tutorial-body dl>div{border-top:1px solid var(--line);padding:15px 0}.tutorial-body dt{font-size:14px;font-weight:600;color:#def0c9}.tutorial-body dd{margin:7px 0 0;color:#b9c7d5;font-size:14px;line-height:1.7}
+.tutorial-footer{padding:16px 24px;display:flex;justify-content:space-between;gap:20px;border-top:1px solid var(--line);flex-shrink:0;background:#101720}.tutorial-footer p{font-size:11px;color:#a8b5c6;line-height:1.5;margin-top:5px}.tutorial-preference{display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer}.tutorial-preference input{width:18px;height:18px;accent-color:var(--lime);margin:0}.tutorial-actions{display:flex;align-items:center;gap:8px}.tutorial-actions button{padding:10px 12px;min-height:42px;white-space:nowrap}.tutorial-dialog button:focus-visible,.tutorial-dialog select:focus-visible{outline:2px solid var(--lime);outline-offset:2px}
+@media(max-width:760px){.topbar{flex-wrap:wrap;height:auto;min-height:76px;padding:14px 16px;gap:12px}.tutorial-launch{margin-left:auto}.tutorial-dialog{width:calc(100vw - 16px);height:calc(100dvh - 16px);border-radius:10px}.tutorial-header{padding:12px;gap:8px}.tutorial-header>span{font-size:12px}.tutorial-header>div{gap:8px}.tutorial-layout{display:flex;flex-direction:column}.tutorial-index{display:flex;gap:5px;padding:8px;overflow-x:auto;flex-shrink:0;border-right:0;border-bottom:1px solid var(--line)}.tutorial-index button{width:180px;flex-shrink:0;margin:0;padding:7px;font-size:11px}.tutorial-body{padding:20px;flex:1;min-height:0}.tutorial-footer{padding:12px;flex-direction:column;gap:10px}.tutorial-actions{justify-content:space-between;flex-wrap:wrap}.tutorial-actions button{font-size:12px;padding:8px}.tutorial-body dd{font-size:13px}}
+.tutorial-body progress{appearance:none;border:0;border-radius:3px;overflow:hidden;background:#293342}.tutorial-body progress::-webkit-progress-bar{background:#293342}.tutorial-body progress::-webkit-progress-value{background:var(--lime)}.tutorial-body progress::-moz-progress-bar{background:var(--lime)}
+.operational-assessment{margin-top:16px;border-color:#b9e89155}.operational-assessment h4{margin:0 0 12px}.operational-legend{display:flex;flex-wrap:wrap;gap:8px 14px;font-size:10px;margin:8px 0;color:#b7c4d5}.operational-legend span{display:flex;align-items:center;gap:5px}.operational-legend i{display:inline-block;width:10px;height:10px;border-radius:2px}.operational-assessment .requirement-line{gap:12px;align-items:flex-start}.operational-assessment .requirement-line strong{text-align:right}

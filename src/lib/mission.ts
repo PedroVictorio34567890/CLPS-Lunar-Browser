@@ -6,12 +6,14 @@ export const DEFAULT_MISSION: MissionRequirements = {
   minEarthElevationDeg: 5, minAvailabilityPercent: 90, maxOutageHours: 6,
   operatingPowerW: 100, standbyPowerW: 30, solarPowerW: 300, panelMode: 'tracking',
   batteryWh: 2000, initialChargePercent: 100, reservePercent: 20,
+  operatingDutyPercent: 100, generationFactorPercent: 85, panelTiltDeg: 90, panelAzimuthDeg: 0,
 };
 export function missionError(m: MissionRequirements): string | null {
-  const numeric = Object.entries(m).filter(([key]) => key !== 'panelMode');
-  if (numeric.some(([, value]) => typeof value !== 'number' || !Number.isFinite(value))) return 'Completa todos los requisitos con números válidos.';
+  const numeric = (Object.keys(DEFAULT_MISSION) as (keyof MissionRequirements)[]).filter(key => key !== 'panelMode');
+  if (numeric.some(key => typeof m[key] !== 'number' || !Number.isFinite(m[key]))) return 'Completa todos los requisitos con números válidos.';
   if (m.minEarthElevationDeg < 0 || m.minEarthElevationDeg >= 90) return 'La elevación mínima debe estar entre 0° y menos de 90°.';
-  if ([m.minAvailabilityPercent, m.initialChargePercent, m.reservePercent].some(v => v < 0 || v > 100)) return 'Los porcentajes deben estar entre 0 y 100.';
+  if ([m.minAvailabilityPercent, m.initialChargePercent, m.reservePercent, m.operatingDutyPercent, m.generationFactorPercent].some(v => v < 0 || v > 100)) return 'Los porcentajes deben estar entre 0 y 100.';
+  if (m.panelTiltDeg < 0 || m.panelTiltDeg > 90 || m.panelAzimuthDeg < 0 || m.panelAzimuthDeg >= 360) return 'Inclinación entre 0° y 90°; azimut entre 0° y menos de 360°.';
   if (m.maxOutageHours < 0) return 'La interrupción máxima no puede ser negativa.';
   if ([m.operatingPowerW, m.standbyPowerW, m.solarPowerW].some(v => v < 0) || m.batteryWh <= 0) return 'Las potencias deben ser positivas o cero y la capacidad de batería mayor que cero.';
   if (m.reservePercent > m.initialChargePercent) return 'La carga inicial no puede ser menor que la reserva mínima.';

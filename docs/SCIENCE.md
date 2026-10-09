@@ -58,7 +58,7 @@ La recomendación señala el mayor índice relativo entre candidatos (empates co
 - DEM y obstáculos locales: pueden cambiar de forma sustancial los resultados cerca del polo. Se advierte cuando alguno de los centros pasa a menos de 1° del horizonte.
 - Eclipses, discos solares/terrestres extendidos, tiempo de luz y aberración. Un centro sobre el horizonte no garantiza que el disco esté completamente visible o que el Sol no esté eclipsado.
 - Estación terrestre concreta, rotación de su ubicación, disponibilidad DSN, radiofrecuencia, antenas, potencia, atmósfera terrestre y relés.
-- Energía generada, ángulo de paneles, batería, temperatura, pendiente y seguridad de aterrizaje.
+- Comportamiento real de batería: límites de potencia, pérdidas de carga, degradación y temperatura. Pendiente y seguridad de aterrizaje.
 - Escena 3D: centros y distancias del Sol y de la Tierra sincronizados con el instante UTC, con la misma efeméride que las series del informe. Conversión a Three.js: (x, y, z) científico → (x, z, −y) / 1737,4. Terminador esférico mediante luz solar direccional; no incluye eclipses ni relieve. La luz ambiente, atmósfera, halo, estrellas y orientación de la textura terrestre son visuales, no resultados científicos.
 
 Antes de un análisis polar de precisión: DEM/LOLA, marco lunar y transformación cartográfica explícitos (p. ej. SPICE/MOON_ME), horizonte por azimut, tolerancias de navegación, eclipses y requisitos reales de misión.
@@ -89,3 +89,25 @@ El observador tiene altura cero y el horizonte geométrico está a 0°. Una semi
 La evaluación de misión es una capa posterior al cálculo astronómico. Para cada muestra se usa elevación terrestre menos el mínimo configurado y se aplica la misma integración temporal e interpolación de cruces. Se evalúan disponibilidad ≥ mínimo e interrupción máxima ≤ tolerancia, sin redondear los resultados mostrados y con tolerancia numérica de 1e-9 en porcentaje/horas. El umbral se refiere al centro terrestre y debe superarse estrictamente; no define la visibilidad de una estación concreta.
 
 Las bandas del bloque de requisitos emplean el umbral de misión. Las curvas y métricas astronómicas de referencia conservan 0°, explícitamente identificadas. Los intervalos se recortan al periodo, se listan de mayor a menor duración y no acreditan viabilidad de radio o energética. La copia de parámetros queda asociada al informe para evitar reinterpretarlo después de modificar los requisitos.
+
+## Balance energético preliminar
+
+Los parámetros son ejemplos editables, no especificaciones NASA. La evaluación conserva la misma copia de requisitos que comunicaciones y usa las efemérides del lugar cada cinco minutos, incluyendo el extremo final exacto.
+
+La demanda es constante: `P = P_operación × fracción_operación + P_reposo × (1 − fracción_operación)`. El porcentaje de operación representa una media, no un horario de actividades. Debe incluirse el consumo de radio dentro de estas cargas; no se calcula todavía un presupuesto de enlace.
+
+La generación es cero con el centro solar bajo o en el horizonte. Con seguimiento se supone incidencia normal ideal. Con panel fijo: `P_solar = P_nominal × factor_útil × max(0, sin(h) cos(β) + cos(h) sin(β) cos(A − A_panel))`, siendo h la elevación solar, β la inclinación desde la horizontal y A el azimut desde el norte hacia el este. El factor útil reúne pérdidas configurables; no modela su evolución térmica ni la distancia solar.
+
+Se dividen los intervalos en los cruces interpolados del horizonte. En cada tramo se evalúa la potencia solar en el punto medio, interpolando el azimut por el arco corto. La carga cambia según `(generación − demanda) × duración` y se limita entre cero y la capacidad. Se contabilizan por separado excedente no almacenado y demanda sin cubrir. La batería ideal puede volver a cargarse después de agotarse; no se modelan el reinicio ni el controlador.
+
+La primera caída bajo reserva y el agotamiento se interpolan dentro del tramo de potencia constante. La reserva no desconecta cargas. Un agotamiento exacto al final puede no causar demanda sin cubrir; ambos indicadores se muestran por separado. Los intervalos de déficit están recortados al periodo. La curva conserva mínimos y máximos al reducir puntos para su presentación.
+
+Se verifican descarga y recarga analíticas, conservación de energía, saturación de batería, amanecer, intervalos parciales, orientación de paneles, porcentajes de operación y copia de entradas. La precisión de los eventos está limitada por el muestreo y los modelos; no incluye relieve, eclipses, eficiencia de carga, límites de potencia o degradación. Cumplir la geometría de comunicaciones y este balance ideal no certifica viabilidad operativa.
+
+## Ventanas conjuntas de comunicaciones y energía
+
+La evaluación conjunta intersecta los intervalos de elevación terrestre por encima del mínimo de misión con el complemento de los intervalos de demanda energética sin cubrir. Usa el consumo medio configurado completo: no asigna prioridades eléctricas ni certifica alimentación individual de la radio. La reserva no desconecta cargas y, por tanto, cruzarla no elimina una ventana conjunta.
+
+Los eventos se ordenan por fecha y se integran como intervalos semiabiertos. Se distinguen acceso con energía, fallo geométrico, déficit energético y ambos. Los cortes consecutivos se fusionan para calcular la interrupción máxima aunque cambie su causa. Las horas de acceso perdido por energía cuentan solamente déficit durante visibilidad geométrica, evitando contar dos veces limitaciones simultáneas. Se aplican los mismos umbrales de disponibilidad e interrupción de misión, sin alterar el índice exploratorio anterior.
+
+La evaluación hereda las limitaciones de la esfera sin relieve, batería ideal y carga media; no representa cobertura de radio, horarios de transmisión, desconexión selectiva, estaciones o relés. Los intervalos quedan recortados al periodo. Pruebas: superposición, extremos exactos, cortes con cambio de causa, acceso total/nulo y agotamiento frente a reserva.

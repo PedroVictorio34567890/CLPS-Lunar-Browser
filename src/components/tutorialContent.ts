@@ -1,0 +1,131 @@
+// Each control is explained in context; the guide never changes mission inputs.
+export const tutorialContent = {
+  es: [
+    { title: 'Tu primera misión lunar', area: 'Bienvenida', intro: 'Esta aplicación te ayuda a comparar lugares de la Luna según su luz solar, su visibilidad de la Tierra y la energía disponible. No necesitas conocimientos previos.', items: [
+      ['El recorrido', 'Primero eliges lugares, después fechas y necesidades de la misión, y finalmente comparas los resultados. Este tutorial explica los controles sin modificar tus datos.'],
+      ['Cómo seguir esta guía', 'Usa Siguiente y Anterior, o el índice de temas. Puedes cerrarla con la X, Salir del tutorial o la tecla Escape. El botón Tutorial de la cabecera permite repetirla desde el principio.'],
+      ['Idioma y apertura', 'El selector de idioma cambia tanto la guía como la aplicación. La guía aparece al abrir la aplicación; si prefieres evitarlo, marca No mostrar al abrir antes de salir. Puedes cambiar esa preferencia al repetirla.'],
+      ['Qué significan los resultados', 'Son estimaciones sobre una Luna esférica, todavía sin montañas ni cráteres. Sirven para explorar posibilidades, no para certificar un aterrizaje o una conexión de radio.'],
+    ]},
+    { title: 'Explora la Luna y mueve la cámara', area: 'Visor 3D · zona central', intro: 'La cámara gira alrededor de la Luna. El Sol y la Tierra se ven desde distintos ángulos según tu posición.', items: [
+      ['Arrastrar', 'Mantén pulsado y mueve el ratón sobre el visor para orbitar con la cámara. En una pantalla táctil, arrastra con un dedo. Esto cambia el punto de vista, no la fecha de la misión.'],
+      ['Rueda o pellizco', 'Usa la rueda del ratón, o junta y separa dos dedos, para acercarte y alejarte. La Tierra mantiene su tamaño y distancia a escala: puede quedar fuera de la imagen.'],
+      ['Pulsar sobre la Luna', 'Un clic breve crea un lugar candidato en ese punto. Arrastrar no debe crear lugares. También puedes introducir coordenadas con el formulario.'],
+      ['Restablecer vista', 'Recupera la posición inicial de la cámara y su órbita automática. No borra lugares ni cambia los requisitos. Si el visor no está disponible, puedes seguir usando el formulario y los cálculos.'],
+    ]},
+    { title: 'Elige y organiza tus lugares', area: '01 · Lugares candidatos', intro: 'Cada lugar es una posición que quieres estudiar. Puedes comparar hasta ocho a la vez.', items: [
+      ['Latitud y Longitud', 'La latitud indica norte o sur (−90 a 90°); la longitud, este u oeste (−180 a 180°). Sur y oeste usan números negativos. Por ejemplo, −85 y 0 sitúan un punto cerca del polo sur.'],
+      ['Añadir ubicación', 'Escribe ambas coordenadas y pulsa este botón. El lugar aparece numerado y con un color que se repite en el visor y en el informe. Al llegar a ocho, elimina uno antes de añadir otro.'],
+      ['Lápiz · editar', 'Carga las coordenadas del lugar en el formulario. Cambia los valores y pulsa Guardar coordenadas. La X de la edición cancela sin aplicar los cambios.'],
+      ['Papelera · eliminar', 'Quita ese lugar de la comparación. La advertencia Fuera del polo sur indica que está fuera de 80° S–90° S, pero no impide analizarlo.'],
+    ]},
+    { title: 'Decide qué fechas estudiar', area: '02 · Periodo de análisis', intro: 'La luz y la visibilidad cambian con el tiempo. Todos los lugares se comparan durante el mismo intervalo.', items: [
+      ['Inicio y Fin', 'Introduce fecha y hora en ambos campos, escribiendo o usando su calendario. El fin debe ser posterior al inicio. Se admiten fechas entre 2000 y 2100, con un máximo de 90 días por análisis.'],
+      ['UTC', 'Es la hora de referencia mundial, no necesariamente la hora de tu país. Todos los campos, gráficas y resultados usan UTC para evitar confusiones de zona horaria.'],
+      ['24 horas · 7, 14 y 30 días', 'Estos botones mantienen el inicio y colocan el fin a esa distancia. Por ejemplo, 7 días estudia una semana desde el inicio seleccionado.'],
+      ['Mensajes de error', 'Si falta una fecha o el intervalo no es válido, aparece una explicación y el análisis se bloquea hasta corregirlo. Cambiar fechas también pausa la reproducción y la lleva al inicio.'],
+    ]},
+    { title: 'Mira el cielo y recorre el tiempo', area: 'Vista orbital · Desde la superficie · Tiempo de la escena', intro: 'Estos controles te permiten entender qué se ve desde un lugar y cómo cambia durante el periodo.', items: [
+      ['Vista orbital y Desde la superficie', 'Vista orbital muestra la Luna desde fuera. En Desde la superficie, elige un lugar ya añadido para observar su cielo local y consultar dirección y elevación del Sol y de la Tierra. La elevación es la altura angular sobre el horizonte.'],
+      ['Mirar desde el suelo', 'Arrastra sobre el cielo, o dale foco y usa las flechas del teclado, para mirar alrededor. Acercar y Alejar cambian el zoom; Mirar al norte orienta la vista al norte. Mirar hacia el Sol o la Tierra apunta hacia ese cuerpo, aunque pueda estar oculto bajo el horizonte.'],
+      ['Barra de tiempo', 'Mueve el deslizador para elegir un instante entre inicio y fin. La escena se actualiza a esa hora. Esto no cambia el periodo completo que se utiliza al analizar.'],
+      ['Reproducir · Pausar · Reproducir de nuevo', 'Reproducir hace avanzar el reloj; Pausar lo detiene. Al llegar al final se para. Reproducir de nuevo empieza otra vez desde el inicio.'],
+      ['Ir al inicio · Ir al final · Velocidad', 'Los botones de salto llevan al primer o último instante y pausan. Velocidad permite avanzar 1, 6 o 24 horas simuladas por segundo real; no cambia la precisión del informe.'],
+    ]},
+    { title: 'Define tus necesidades de comunicación', area: '03 · Requisitos de misión · Prioridad: comunicaciones', intro: 'Aquí decides cuánto acceso geométrico hacia la Tierra necesita tu misión. Los valores iniciales son ejemplos editables, no requisitos NASA.', items: [
+      ['Interrupción máxima tolerable (h)', 'Es el mayor corte continuo que aceptarías. Con 6 h, un corte de 7 h incumple el requisito aunque el resto del periodo tenga buena visibilidad.'],
+      ['Disponibilidad mínima (%)', 'Es la parte del periodo que debe superar la elevación mínima. Un 90% exige acceso geométrico durante al menos nueve décimas partes del tiempo.'],
+      ['Elevación terrestre mínima (°)', 'Es la altura que debe superar el centro de la Tierra sobre el horizonte local. Un margen mayor exige que esté más alta. No representa las montañas reales ni una estación concreta en la Tierra.'],
+      ['Qué se comprueba', 'El lugar debe cumplir tanto la disponibilidad como la interrupción máxima. Ver la Tierra no asegura que una radio pueda comunicar: faltan antenas, estaciones, calidad del enlace y relés.'],
+    ]},
+    { title: 'Configura consumo y paneles solares', area: '03 · Energía · balance de batería', intro: 'Pulsa el título de Energía para desplegar o plegar sus campos. W significa vatios: potencia que se consume o se produce en un instante.', items: [
+      ['Consumo en operación y en reposo (W)', 'Indica lo que consume el equipo trabajando y cuando está en reposo. Incluye la radio dentro de esos consumos si quieres estudiar su alimentación.'],
+      ['Tiempo en operación (%)', 'Define la proporción de actividad. Con 25%, el cálculo mezcla un cuarto de consumo de operación y tres cuartos de reposo. Usa un consumo medio constante; no programa actividades por horas.'],
+      ['Potencia nominal y factor de generación útil', 'La potencia nominal es la referencia de los paneles. El factor útil reduce esa potencia para representar pérdidas: 300 W al 85% dan 255 W antes de considerar la orientación y la noche.'],
+      ['Seguimiento del Sol u Orientación fija', 'El seguimiento supone que el panel apunta idealmente al Sol. En modo fijo, configura Inclinación (0° horizontal, 90° vertical) y Azimut (0° norte, 90° este, 180° sur, 270° oeste). Un panel mal orientado produce menos.'],
+    ]},
+    { title: 'Dimensiona la batería y su reserva', area: '03 · Energía · campos de batería', intro: 'La batería almacena energía para cubrir momentos en los que los paneles no producen suficiente.', items: [
+      ['Capacidad de batería (Wh)', 'Wh significa vatios-hora: energía almacenada. Una batería ideal de 1000 Wh puede suministrar 100 W durante 10 horas si empieza llena y no recibe energía solar.'],
+      ['Carga inicial (%)', 'Es el porcentaje de batería disponible al comienzo del periodo. El 100% significa llena. Debe ser al menos igual a la reserva configurada.'],
+      ['Reserva mínima (%)', 'Es el nivel por debajo del cual quieres recibir una advertencia. La reserva no desconecta el equipo: el modelo sigue consumiendo hasta vaciar la batería.'],
+      ['Límites de este cálculo', 'La batería es ideal: aún no se simulan temperatura, envejecimiento ni límites de potencia. La generación tampoco incluye eclipses ni sombras del relieve.'],
+    ]},
+    { title: 'Calcula y entiende el informe', area: 'Analizar y comparar · informe de misión', intro: 'Cuando tengas lugares, fechas y requisitos válidos, pulsa Analizar y comparar. Durante el cálculo verás Calculando efemérides: se están obteniendo posiciones astronómicas.', items: [
+      ['Requisitos usados y Modelo, precisión e índice', 'Pulsa sus títulos para desplegar los valores usados, el método y sus limitaciones. Cada informe conserva los requisitos del momento en que se calculó.'],
+      ['Comunicaciones primero', 'Cada lugar muestra si cumple disponibilidad e interrupción máxima. La banda azul indica acceso por encima del umbral; la roja, falta de acceso. Abre Interrupciones para consultar los cortes, empezando por el más largo.'],
+      ['Comunicaciones con energía', 'Cruza la visibilidad de la Tierra con la alimentación completa del consumo configurado. Muestra las ventanas conjuntas, su mayor interrupción y las horas de acceso perdidas por déficit energético. Despliega Ventanas y causas para ver fechas y motivos. La reserva no corta la alimentación; incluye la radio en tus consumos. No garantiza un enlace real.'],
+      ['Balance energético', 'Revisa carga mínima y final, generación, demanda, excedente y demanda sin cubrir. La gráfica muestra batería y reserva. Los avisos indican cuándo baja de reserva o se vacía; los desplegables detallan intervalos de déficit e hipótesis.'],
+      ['Luz, curvas e índice', 'La iluminación resume duración de luz y oscuridad. Las curvas muestran elevación del Sol y de la Tierra; sus bandas de referencia usan 0°, que puede diferir de tu umbral de comunicaciones. El índice combina luz y visibilidad: una puntuación alta no garantiza cumplir los requisitos.'],
+    ]},
+    { title: 'Ya puedes empezar', area: 'Cerrar · revisar · repetir', intro: 'Prueba un caso sencillo: añade latitud −85 y longitud 0, elige 7 días, revisa los requisitos y pulsa Analizar y comparar.', items: [
+      ['Cerrar y volver al informe', 'La X del informe o Escape vuelve al visor. Ver informe, junto al reloj, lo abre otra vez mientras siga vigente. Si cambias lugares, fechas o requisitos, tendrás que analizar de nuevo.'],
+      ['Repetir el tutorial', 'El botón Tutorial de la cabecera abre esta guía desde el principio. También puedes saltar directamente a cualquier tema con su índice. No borra ni modifica tu misión.'],
+      ['Antes de cerrar la aplicación', 'Los lugares y requisitos son datos de esta sesión: recargar no los guarda. El idioma y tu preferencia de mostrar esta guía se recuerdan en este navegador cuando permite almacenamiento. El logotipo vuelve al inicio y puede recargar la página.'],
+      ['Enlaces y próximos pasos', 'El crédito de textura y las referencias del informe abren fuentes externas. PRÓXIMAMENTE es un aviso de funciones pendientes, no un botón activo. Revisa siempre las advertencias antes de interpretar un resultado.'],
+    ]},
+  ],
+  en: [
+    { title: 'Your first lunar mission', area: 'Welcome', intro: 'Compare lunar locations by sunlight, visibility of Earth and available energy. No prior knowledge is needed.', items: [
+      ['The route', 'Choose sites, then dates and mission needs, and finally compare the results. This guide explains the controls without changing your data.'],
+      ['Using this guide', 'Use Next and Previous or the topic index. Close with the X, Exit tutorial or Escape. The Tutorial button in the header restarts the guide.'],
+      ['Language and startup', 'The language selector changes both the guide and the app. The guide opens on startup; select Do not show on startup before leaving to disable that. Reopen the guide to change this preference.'],
+      ['What the results mean', 'These are estimates for a spherical Moon, without mountains or craters. They help explore options but do not certify a landing or a radio connection.'],
+    ]},
+    { title: 'Explore the Moon and move the camera', area: '3D viewer · center area', intro: 'The camera orbits the Moon. Your viewpoint changes where you see the Sun and Earth.', items: [
+      ['Drag', 'Hold and move the mouse over the viewer to orbit the camera. On a touch screen, drag with one finger. This changes your viewpoint, not the mission date.'],
+      ['Wheel or pinch', 'Use the mouse wheel or pinch with two fingers to zoom. Earth retains its true scale and distance, so it may be outside the frame.'],
+      ['Click the Moon', 'A brief click creates a candidate site there. Dragging should not create sites. You can also enter coordinates in the form.'],
+      ['Reset view', 'Restores the initial camera position and automatic orbit. It does not delete sites or change requirements. If the viewer is unavailable, you can still use the form and calculations.'],
+    ]},
+    { title: 'Choose and organize your sites', area: '01 · Candidate sites', intro: 'A site is a position you want to study. Compare up to eight at a time.', items: [
+      ['Latitude and Longitude', 'Latitude gives north or south (−90 to 90°); longitude gives east or west (−180 to 180°). South and west are negative. For example, −85 and 0 locate a point near the south pole.'],
+      ['Add site', 'Enter both coordinates and press this button. Each site gets a number and color shared by the viewer and report. At eight sites, remove one before adding another.'],
+      ['Pencil · edit', 'Loads that site into the form. Change the values and press Save coordinates. The editing X cancels without applying changes.'],
+      ['Trash · remove', 'Removes that site from the comparison. Outside the south pole warns that it lies outside 80° S–90° S, but analysis remains available.'],
+    ]},
+    { title: 'Choose the dates to study', area: '02 · Analysis period', intro: 'Light and visibility change over time. All sites are compared over the same interval.', items: [
+      ['Start and End', 'Type a date and time or use each field’s calendar. End must follow start. Dates must be between 2000 and 2100, with a maximum of 90 days per analysis.'],
+      ['UTC', 'This is the world reference time, not necessarily your local time. Every date field, chart and result uses UTC to avoid time-zone confusion.'],
+      ['24 hours · 7, 14 and 30 days', 'These buttons retain the start and set the end that far ahead. For example, 7 days studies one week from your chosen start.'],
+      ['Error messages', 'Missing dates or invalid intervals show an explanation and prevent analysis until corrected. Changing dates also pauses playback and returns it to the start.'],
+    ]},
+    { title: 'Look at the sky and move through time', area: 'Orbital view · From the surface · Scene time', intro: 'Understand what is visible from a site and how it changes during the period.', items: [
+      ['Orbital view and From the surface', 'Orbital view shows the Moon from outside. In From the surface, choose an existing site to see its local sky and the direction and elevation of the Sun and Earth. Elevation is angular height above the horizon.'],
+      ['Looking from the ground', 'Drag the sky, or focus it and use the keyboard arrows, to look around. Zoom in and Zoom out change magnification; Look north faces north. Look toward the Sun or Earth aims at that body, even if it is hidden below the horizon.'],
+      ['Time slider', 'Move it to choose an instant between start and end. The scene updates to that time. This does not change the full analysis period.'],
+      ['Play · Pause · Play again', 'Play advances the clock; Pause stops it. It stops at the end. Play again restarts from the beginning.'],
+      ['Go to start · Go to end · Speed', 'The skip buttons jump to the first or last instant and pause. Speed advances 1, 6 or 24 simulated hours per real second; it does not change report accuracy.'],
+    ]},
+    { title: 'Set your communication needs', area: '03 · Mission requirements · Communications priority', intro: 'Decide how much geometric access toward Earth your mission needs. Defaults are editable examples, not NASA requirements.', items: [
+      ['Maximum tolerated outage (h)', 'The longest continuous gap you accept. With 6 h, a 7 h gap fails even if visibility is good during the rest of the period.'],
+      ['Minimum availability (%)', 'The share of the period that must exceed the minimum elevation. At 90%, access is required for at least nine tenths of the time.'],
+      ['Minimum Earth elevation (°)', 'The height Earth’s center must exceed above the local horizon. A larger margin requires it to be higher. It does not represent actual mountains or a specific Earth station.'],
+      ['What is checked', 'Both availability and maximum outage must pass. Seeing Earth does not ensure a working radio link: antennas, stations, link quality and relays are not modeled.'],
+    ]},
+    { title: 'Configure consumption and solar panels', area: '03 · Energy · battery balance', intro: 'Click the Energy heading to expand or collapse its fields. W means watts: power used or produced at an instant.', items: [
+      ['Operating and standby power (W)', 'Enter equipment power while working and at rest. Include the radio in those loads to study its power supply.'],
+      ['Operating time (%)', 'Defines the active fraction. At 25%, the model mixes one quarter operating load and three quarters standby load. It uses a constant average, not a timed activity schedule.'],
+      ['Nominal panel power and useful generation factor', 'Nominal power is the panel reference. The useful factor reduces it for losses: 300 W at 85% gives 255 W before orientation and night are considered.'],
+      ['Sun tracking or Fixed orientation', 'Tracking assumes ideal pointing toward the Sun. For fixed panels set Tilt (0° horizontal, 90° vertical) and Azimuth (0° north, 90° east, 180° south, 270° west). Poor pointing reduces output.'],
+    ]},
+    { title: 'Size the battery and its reserve', area: '03 · Energy · battery fields', intro: 'The battery stores energy for times when the panels do not produce enough.', items: [
+      ['Battery capacity (Wh)', 'Wh means watt-hours: stored energy. An ideal 1000 Wh battery supplies 100 W for 10 hours if it starts full and receives no solar energy.'],
+      ['Initial charge (%)', 'The battery percentage available at the start. 100% means full. It must be at least the configured reserve.'],
+      ['Minimum reserve (%)', 'The level below which you want a warning. Reserve does not switch equipment off: consumption continues until the battery is empty.'],
+      ['Calculation limits', 'The battery is ideal: temperature, aging and power limits are not modeled yet. Generation excludes eclipses and terrain shadows.'],
+    ]},
+    { title: 'Calculate and read the report', area: 'Analyze and compare · mission report', intro: 'With valid sites, dates and requirements, press Analyze and compare. Calculating ephemerides means astronomical positions are being computed.', items: [
+      ['Requirements used and Model, accuracy and index', 'Expand these headings to inspect captured settings, methods and limitations. Each report retains the requirements used when it was calculated.'],
+      ['Communications first', 'Each site shows whether availability and maximum outage pass. Blue means access above the threshold; red means no access. Expand Outages to inspect gaps, longest first.'],
+      ['Communications with energy', 'Combines Earth visibility with full supply of the configured load. Shows joint windows, the longest outage and access hours lost to energy deficit. Expand Chronological windows and causes for dates and reasons. Reserve does not cut power; include the radio in your loads. This does not guarantee a real link.'],
+      ['Energy balance', 'Review minimum and final charge, generation, demand, surplus and unserved demand. The chart shows battery charge and reserve. Events identify reserve violations and depletion; expandable sections list deficit intervals and assumptions.'],
+      ['Light, curves and index', 'Illumination summarizes light and darkness durations. Curves show Sun and Earth elevation; their reference bands use 0°, which may differ from your communications threshold. The index combines light and visibility: a high score does not guarantee requirements pass.'],
+    ]},
+    { title: 'You are ready to start', area: 'Close · review · repeat', intro: 'Try a simple case: add latitude −85 and longitude 0, choose 7 days, review requirements and press Analyze and compare.', items: [
+      ['Close and reopen the report', 'The report X or Escape returns to the viewer. View report beside the clock reopens it while it is current. Changing sites, dates or requirements requires another analysis.'],
+      ['Repeat the tutorial', 'The Tutorial button in the header restarts this guide. You can jump directly to any topic in the index. It does not delete or modify your mission.'],
+      ['Before closing the app', 'Sites and requirements last only for this session: reloading does not save them. Language and the guide startup preference are remembered in this browser when storage is available. The logo returns home and may reload the page.'],
+      ['Links and next steps', 'Texture credits and report references open external sources. COMING SOON marks pending features, not an active button. Always read the caveats before interpreting a result.'],
+    ]},
+  ],
+};

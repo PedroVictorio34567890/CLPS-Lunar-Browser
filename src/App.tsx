@@ -1,6 +1,7 @@
 import { t, useLanguage } from './i18n';
 import { lazy, Suspense, useState } from 'react';
 import { ArrowUpRight, ChevronRight, Orbit, FlaskConical, Globe2 } from 'lucide-react';
+import { Tutorial, shouldShowTutorial } from './components/Tutorial';
 import { LocationPanel } from './components/LocationPanel';
 import { LanguageMenu } from './components/LanguageMenu';
 import { MissionPanel } from './components/MissionPanel';
@@ -16,6 +17,7 @@ import type { AnalysisPeriod, ComparisonReport } from './models';
 const MoonScene = lazy(() => import('./scene/MoonScene').then(module => ({ default: module.MoonScene })));
 export default function App() {
   useLanguage();
+  const [tutorialOpen, setTutorialOpen] = useState(shouldShowTutorial);
   const { sites, addSite, editSite, removeSite } = useSites();
   const [period, setPeriod] = useState<AnalysisPeriod>({ start: '2026-09-27T00:00', end: '2026-10-04T00:00' });
   const playback = usePlayback(period);
@@ -27,15 +29,16 @@ export default function App() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const currentReport = report && sameMission(report.mission, mission) && report.period.start === period.start && report.period.end === period.end && report.sites.length === sites.length && report.sites.every((r, i) => r.site.id === sites[i].id && r.site.latitude === sites[i].latitude && r.site.longitude === sites[i].longitude) ? report : undefined;
-  async function analyze() { const invalid = missionError(mission); if (invalid) { setError(invalid); return; } const missionSnapshot = { ...mission }; setBusy(true); setError(''); try { setReport({ ...await workerEngine.compare(sites, period), mission: missionSnapshot }); setReportOpen(true); } catch (e) { setError(e instanceof Error ? e.message : t("No se pudo preparar el informe.")); } finally { setBusy(false); } }
+  async function analyze() { const invalid = missionError(mission); if (invalid) { setError(invalid); return; } const missionSnapshot = { ...mission }; setBusy(true); setError(''); try { setReport({ ...await workerEngine.compare(sites, period, missionSnapshot), mission: missionSnapshot }); setReportOpen(true); } catch (e) { setError(e instanceof Error ? e.message : t("No se pudo preparar el informe.")); } finally { setBusy(false); } }
   return <div className="app-shell">
-    <header className="topbar"><a className="brand" href="/" aria-label={t("Lunar Mission Browser, inicio")}><span className="brand-icon"><Orbit size={29}/></span><span>LUNAR<span className="brand-sub">MISSION BROWSER</span></span></a><div className="header-context"><span className="header-divider"/>CLPS <span className="muted">/</span> {t("Exploración del polo sur")}</div><div className="challenge">SPACE APPS <span>2026</span><span className="prototype">{t("PROTOTIPO · V0.2")}</span></div><LanguageMenu/></header>
+    <header className="topbar"><a className="brand" href="/" aria-label={t("Lunar Mission Browser, inicio")}><span className="brand-icon"><Orbit size={29}/></span><span>LUNAR<span className="brand-sub">MISSION BROWSER</span></span></a><div className="header-context"><span className="header-divider"/>CLPS <span className="muted">/</span> {t("Exploración del polo sur")}</div><div className="challenge">SPACE APPS <span>2026</span><span className="prototype">{t("PROTOTIPO · V0.2")}</span></div><button id="tutorial-launch" className="tutorial-launch" disabled={busy} onClick={() => { if (playback.playing) playback.toggle(); setTutorialOpen(true); }}>Tutorial</button><LanguageMenu/></header>
     <div className="workspace"><aside className="configuration"><div className="config-intro"><div className="eyebrow">{t("PLANIFICACIÓN DE MISIÓN")}</div><h2>{t("Explorar. Seleccionar.")}<br/>{t("Comparar.")}</h2><p>{t("Prepara lugares de aterrizaje según luz solar y comunicación con la Tierra.")}</p></div>
       <LocationPanel sites={sites} onAdd={addSite} onEdit={editSite} onRemove={removeSite}/>
       <TimePanel period={period} onChange={setPeriod}/><MissionPanel mission={mission} onChange={setMission}/>
       <div className="analyze-block"><button className="primary full" onClick={analyze} disabled={!sites.length || !!periodError(period) || !!missionError(mission) || busy}>{busy ? t("Calculando efemérides…") : t("Analizar y comparar")}<ArrowUpRight size={18}/></button><p>{!sites.length ? t("Selecciona al menos un lugar para continuar.") : periodError(period) ? t("Corrige el periodo para continuar.") : missionError(mission) ? t("Corrige los requisitos de misión para continuar.") : t("{0} {1} para comparar.", [sites.length, sites.length === 1 ? t("lugar listo") : t("lugares listos")])}</p>{error && <p className="error" role="alert">{t(error)}</p>}</div>
     </aside><main className="main-surface"><div className="view-nav"><span className="active-tab"><Globe2 size={15}/>  {t("Superficie lunar")}</span><span className="view-trail">{t("Luna")} <ChevronRight size={12}/>  {t("Polo sur")}</span><span className="view-tag">{t("VISTA 3D")}</span></div><div className="view-selector"><button aria-pressed={!surfaceSite} onClick={() => setSurfaceId('')}>{t("Vista orbital")}</button><label>{t("Desde la superficie")}<select aria-label={t("Lugar para vista de superficie")} value={surfaceSite?.id ?? ''} onChange={event => setSurfaceId(event.target.value)} disabled={!sites.length}><option value="">{sites.length ? t("Elige un lugar") : t("Añade un lugar primero")}</option>{sites.map(site => <option key={site.id} value={site.id}>{t("Lugar")} {site.slot + 1}</option>)}</select></label></div><Suspense fallback={<div className="scene scene-fallback">{t("Preparando el explorador lunar…")}</div>}><MoonScene sites={sites} onSelect={addSite} timestamp={playback.time} surfaceSite={surfaceSite}/></Suspense><Timeline playback={playback} report={currentReport} onOpenReport={() => setReportOpen(true)}/><div className="science-notice"><FlaskConical size={15}/><p><strong>{t("Cálculo geométrico disponible.")}</strong>  {t("Efemérides sobre esfera sin relieve. Escena sincronizada con el instante UTC seleccionado. Sin sombras del relieve ni eclipses; brillo y atmósfera estilizados.")}</p></div></main></div>
     <footer className="footer"><span>CLPS LUNAR MISSION BROWSER <span className="muted">/</span>  {t("Proyecto para Space Apps 2026 · No oficial")}</span><a href="https://svs.gsfc.nasa.gov/4720/" target="_blank" rel="noreferrer">{t("Textura: NASA Scientific Visualization Studio")} <ArrowUpRight size={12}/></a></footer>
+    {tutorialOpen && <Tutorial onClose={() => setTutorialOpen(false)}/>}
     {report && reportOpen && <ComparisonPanel report={report} onClose={() => setReportOpen(false)}/>}
   </div>;
 }
