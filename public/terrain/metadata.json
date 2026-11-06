@@ -1,0 +1,21 @@
+{
+  "id": "pgda-site04-20m-v1",
+  "source": "https://pgda.gsfc.nasa.gov/data/LOLA_5mpp/Site04/Site04_final_adj_5mpp_surf.tif",
+  "citation": "Barker et al. (2021), Planetary and Space Science 203, 105119",
+  "frame": "MOON_ME / DE421",
+  "radiusM": 1737400,
+  "width": 800,
+  "height": 800,
+  "x0": -8997.5,
+  "y0": 997.5,
+  "spacingM": 20,
+  "nativeSpacingM": 5,
+  "sourceSha256": "38ff70dbdf2f066c2cfa94a646c3a59d653ce7f6b4528b15fc1b43ee397ce758",
+  "sha256": "7cb1593549d79dcae614940cf4058349bf5aa1948c8d082cb964a14d7c77b9a7",
+  "minM": -2846.523193359375,
+  "maxM": 1804.99951171875,
+  "demo": {
+    "latitude": -89.76674147712977,
+    "longitude": -171.89280908299654
+  }
+}

@@ -75,7 +75,7 @@ El suelo liso es una máscara visual del horizonte, no terreno NASA. No represen
 | `tests/domain.test.ts` | Pruebas de coordenadas, límites, UTC y honestidad del informe |
 | `tests/science.test.ts`, `tests/fixtures/` | Pruebas astronómicas y referencia NASA/JPL Horizons |
 
-React + TypeScript + Vite, con React Three Fiber y Drei para integrar Three.js en el ciclo de vida de React. La escena se carga por separado. El resto de la aplicación sigue siendo utilizable si no hay WebGL. El estado es de sesión: recargar elimina los lugares seleccionados.
+React + TypeScript + Vite, con React Three Fiber y Drei para integrar Three.js en el ciclo de vida de React. La escena se carga por separado. El resto de la aplicación sigue siendo utilizable si no hay WebGL. La misión de trabajo es de sesión; los escenarios guardados explícitamente se recuperan desde la biblioteca local del navegador.
 
 Convención: esfera fija con +Y al norte, longitud 0° en +X y este hacia −Z. `x = r cos(lat) cos(lon)`, `y = r sin(lat)`, `z = −r cos(lat) sin(lon)`. Coincide con los UV de `SphereGeometry` y la textura NASA centrada en 0°. La selección convierte la intersección a coordenadas locales antes de calcular latitud y longitud. El punto exacto del polo no tiene longitud físicamente única.
 
@@ -109,7 +109,7 @@ El informe captura una copia de los requisitos al iniciar el cálculo. Si cambia
 
 La evaluación reutiliza las muestras de elevación de cinco minutos del motor y resta el umbral antes de interpolar cruces. Las cifras de referencia a 0° y el índice luz/visibilidad se mantienen identificados por separado; ese índice no evalúa requisitos de misión. No se modelan estaciones terrestres, relés, calidad de señal ni presupuesto de enlace, y el margen angular no sustituye el relieve.
 
-El balance energético utiliza consumo en operación/reposo, porcentaje de operación, potencia nominal y factor útil de generación, capacidad de batería, carga inicial y reserva. Admite seguimiento solar ideal o panel fijo con inclinación y azimut. Muestra la curva de carga, mínimos, energía generada, demanda sin cubrir, excedente, caída bajo reserva y periodos sin energía suficiente. La reserva es una alerta: no desconecta cargas. La carga inicial debe ser al menos la reserva. Los proyectos siguen siendo de sesión; recargar no guarda estos datos.
+El balance energético utiliza consumo en operación/reposo, porcentaje de operación, potencia nominal y factor útil de generación, capacidad de batería, carga inicial y reserva. Admite seguimiento solar ideal o panel fijo con inclinación y azimut. Muestra la curva de carga, mínimos, energía generada, demanda sin cubrir, excedente, caída bajo reserva y periodos sin energía suficiente. La reserva es una alerta: no desconecta cargas. La carga inicial debe ser al menos la reserva. Los cambios de trabajo requieren guardado explícito en Escenarios guardados para recuperarlos tras recargar.
 
 Verificación: 31 pruebas, incluidas descarga, recarga, conservación de energía, cruces solares, orientación de paneles, idiomas y ventanas con umbral angular, límites inclusivos, cortes completos, referencia a 0°, validación y detección de requisitos modificados.
 
@@ -124,3 +124,33 @@ Por defecto aparece en cada apertura. No mostrar al abrir guarda una preferencia
 El informe muestra ahora las ventanas en las que coinciden acceso geométrico a la Tierra y alimentación completa del consumo medio configurado. Incluye disponibilidad conjunta, corte más largo, horas perdidas por déficit energético y una cronología con causas. Usa los umbrales de comunicaciones de la misión. No certifica un enlace de radio ni supone que la reserva desconecte equipos. La explicación también está incorporada al tutorial.
 
 Verificación actual: 35 pruebas automatizadas, TypeScript y compilación de producción.
+
+## Próximos eventos
+
+Tras analizar, el desplegable bajo el reloj muestra próximos cruces de los centros del Sol y la Tierra a 0°, más pérdida/recuperación del acceso según la elevación terrestre de misión. El lugar se selecciona independientemente de la cámara. Los contadores avanzan con el instante de escena usando las ventanas del informe vigente, sin recalcular efemérides en cada fotograma. Cambiar entradas invalida el informe y los contadores. No se inventan eventos en los extremos recortados del periodo; un evento alcanzado deja de ser futuro. Si no se detecta otro cruce, se invita a ampliar el periodo. Aproximaciones sobre esfera, con muestreo de cinco minutos e interpolación, redondeadas hacia arriba a minutos.
+
+Verificación actual: 38 pruebas, incluyendo extremos recortados, eventos alcanzados, tangencia y diferencia entre horizonte y umbral de comunicaciones.
+
+## Biblioteca local de escenarios
+
+Escenarios guardados permite guardar con nombre los lugares (coordenadas, identificadores, colores y números), fechas UTC y todos los requisitos de comunicaciones y energía. Guardar como nuevo crea una referencia independiente; Actualizar actual reemplaza la versión en edición. Duplicar guardado copia la versión persistida seleccionada, no los cambios de trabajo sin guardar. Cargar restaura la misión y reinicia selección de superficie, edición de coordenadas e informe. Debe analizarse de nuevo; no se persisten informes ni cámara.
+
+La biblioteca admite 50 escenarios y usa localStorage con formato versionado y validación de entradas. Se avisa antes de sustituir cambios sin guardar. No hay guardado automático ni sincronización entre navegadores, dispositivos o direcciones del servidor. Se detectan cambios de otra pestaña antes de escribir; datos corruptos o de versión incompatible no se sobrescriben. Un fallo de almacenamiento no se presenta como guardado correcto. Borrar los datos del navegador elimina esta biblioteca; todavía no hay exportación de respaldo.
+
+Verificación actual: 41 pruebas, incluidas persistencia, independencia de copias, validación y conflictos de escritura.
+
+## Comparador de escenarios y retrasos
+
+Desde Escenarios guardados, Comparar escenarios y retrasos abre una comparación de 2–4 versiones guardadas. Cada lugar de cada escenario ocupa una fila, con fechas, duración, coordenadas, acceso geométrico, acceso con energía, mayor corte conjunto, luz, batería mínima y demanda sin cubrir. La referencia de diferencias se puede elegir por fila: porcentajes se comparan en puntos porcentuales (pp), no en variación porcentual relativa. Los umbrales se evalúan individualmente y se pueden consultar; no se ofrece una clasificación automática cuando cambian requisitos o duración.
+
+Las variantes temporales desplazan ambas fechas +1, +3, +7, +14 o +30 días UTC, conservando duración, lugares y requisitos, incluida la carga inicial. Representan un nuevo aterrizaje, no energía consumida durante una espera. No se guardan ni modifican la biblioteca o la misión abierta. Los cálculos usan el worker en secuencia; cerrar evita iniciar los siguientes después de finalizar el actual. La comparación captura las versiones al abrirse y los resultados se descartan al modificar la selección. Para usar actualizaciones de la biblioteca hay que cerrar y reabrir el comparador.
+
+Verificación actual: 44 pruebas, incluidas conservación de duración UTC, año bisiesto, límites temporales, independencia de variantes y evaluación conjunta por escenario.
+
+## Primer estudio de relieve real: Shackleton
+
+Añadir ejemplo LOLA en Lugares candidatos coloca un punto central del DEM NASA PGDA Site04. Analizar muestra Relieve local LOLA al final del informe: perfil por azimut y comparación con la esfera para luz, comunicaciones, batería y disponibilidad conjunta. También admite coordenadas manuales dentro del interior cubierto. Fuera de la zona se indica ausencia de cobertura.
+
+El derivado ocupa 2,56 MB, procede de datos de 5 m y se distribuye a 20 m; examina obstáculos cercanos hasta 3 km con observador a 2 m. Ahora se combina con un recorte regional LOLA de 80 m/píxel (18 MB) para extender el horizonte hasta 100 km. El informe compara la visibilidad terrestre y el mayor corte geométrico a 3 y 100 km. Es experimental. La orientación local usa una tabla derivada de SPICE en MOON_ME_DE421, válida entre 2000 y el 1 de enero de 2050 UTC; fuera del intervalo se informa de falta de cobertura. No es el relieve completo del polo. Los contadores, el comparador de escenarios y la vista de superficie usan LOLA donde hay cobertura y un informe vigente; el resto se identifica como esférico. La vista orbital y la referencia del informe siguen siendo esféricas. Límites y procedencia reproducible: docs/SCIENCE.md y public/terrain/README.md.
+
+Verificación actual: 66 pruebas, TypeScript y compilación de producción.

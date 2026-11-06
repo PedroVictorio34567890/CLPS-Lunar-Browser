@@ -1,0 +1,17 @@
+{
+  "frame": "MOON_ME_DE421",
+  "inputFrame": "J2000",
+  "startTtDays": -1.0,
+  "stepDays": 0.25,
+  "count": 73061,
+  "utcStart": "2000-01-01T00:00:00Z",
+  "utcEnd": "2050-01-01T00:00:00Z",
+  "sha256": "037a27ed81c78be1b6abd7286f53eab11c8412824b468568afb95808fc208301",
+  "maxMidpointErrorArcsec": 0.022555184669472893,
+  "spiceypy": "8.3.0",
+  "kernels": {
+    "naif0012.tls": "678e32bdb5a744117a467cd9601cd6b373f0e9bc9bbde1371d5eee39600a039b",
+    "moon_080317.tf": "78732477b96f9863e7b0d65bcee3c22b8707ca5ed0db56d1173319cb2e8c7993",
+    "moon_pa_de421_1900-2050.bpc": "656f90616403d75a75f0cd6c8830fc5b44f8cb4facb5ccb8915e752b397520cf"
+  }
+}

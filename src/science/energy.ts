@@ -28,13 +28,20 @@ export function simulateEnergy(samples: ElevationSample[], m: MissionRequirement
     if (!Number.isFinite(a.time) || !Number.isFinite(b.time) || b.time <= a.time || !Number.isFinite(a.sun) || !Number.isFinite(b.sun)) throw new Error('Serie temporal inválida.');
     const cuts = [0, 1];
     if (a.sun * b.sun < 0) cuts.splice(1, 0, -a.sun / (b.sun - a.sun));
+    const clearanceA = a.sunClearance ?? a.sun, clearanceB = b.sunClearance ?? b.sun;
+    if (!Number.isFinite(clearanceA) || !Number.isFinite(clearanceB)) throw new Error('Serie temporal inválida.');
+    if (clearanceA * clearanceB < 0) {
+      const crossing = -clearanceA / (clearanceB - clearanceA);
+      if (!cuts.includes(crossing)) cuts.push(crossing);
+    }
+    cuts.sort((x, y) => x - y);
     for (let j = 1; j < cuts.length; j++) {
       const lo = cuts[j - 1], hi = cuts[j], mid = (lo + hi) / 2;
       const start = a.time + (b.time - a.time) * lo, end = a.time + (b.time - a.time) * hi;
       const hours = (end - start) / HOUR;
       const azA = a.sunAzimuth ?? b.sunAzimuth, azB = b.sunAzimuth ?? a.sunAzimuth;
       const az = azA == null || azB == null ? azA : azA + (((azB - azA + 540) % 360) - 180) * mid;
-      const generation = solarPower(a.sun + (b.sun - a.sun) * mid, az, m);
+      const generation = clearanceA + (clearanceB - clearanceA) * mid > 0 ? solarPower(a.sun + (b.sun - a.sun) * mid, az, m) : 0;
       const net = generation - load;
       result.generatedWh += generation * hours; result.demandWh += load * hours;
       const raw = charge + net * hours;

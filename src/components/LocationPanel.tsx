@@ -5,9 +5,10 @@ import type { CandidateSite, Coordinates } from '../models';
 import { isSouthPolar } from '../lib/coordinates';
 import { formatCoordinates } from '../i18n';
 import { MAX_SITES } from '../lib/sites';
+import terrainMetadata from '../science/terrainMetadata.json';
 interface Props { sites: CandidateSite[]; onAdd: (c: Coordinates) => void; onEdit: (id: string, c: Coordinates) => void; onRemove: (id: string) => void }
 export function LocationPanel({ sites, onAdd, onEdit, onRemove }: Props) {
-  useLanguage();
+  const en = useLanguage() === 'en';
   const [editing, setEditing] = useState<string | null>(null);
   const [latitude, setLatitude] = useState('');
   const [longitude, setLongitude] = useState('');
@@ -28,6 +29,8 @@ export function LocationPanel({ sites, onAdd, onEdit, onRemove }: Props) {
       <div className="coordinate-hint">{t("Sur y oeste: valores negativos")}</div>
       <button className="secondary full" disabled={atLimit && !editing} type="submit">{editing ? <Check size={15}/> : <Plus size={15}/>} {editing ? t("Guardar coordenadas") : t("Añadir ubicación")}</button>
     </form>
+    <button className="secondary full terrain-example" disabled={atLimit} onClick={() => onAdd(terrainMetadata.demo)}>{en ? 'Add LOLA example · Shackleton rim' : 'Añadir ejemplo LOLA · borde de Shackleton'}</button>
+    <p className="footnote">{en ? 'Sample point inside the local DEM; not a certified landing site.' : 'Punto de muestra dentro del DEM local; no es un lugar de aterrizaje certificado.'}</p>
     {atLimit && <p role="status" className="notice">{t("Has alcanzado el máximo de 8 lugares. Elimina uno para añadir otro.")}</p>}
     <div className="site-list" aria-live="polite">
       {!sites.length && <div className="empty-sites"><MapPin size={23}/><p>{t("Tu próxima misión empieza aquí.")}</p><span>{t("Selecciona el primer lugar para explorar.")}</span></div>}

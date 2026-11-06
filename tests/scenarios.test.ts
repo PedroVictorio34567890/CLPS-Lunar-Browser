@@ -1,0 +1,44 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { copyInputs, inputsKey, makeScenario, parseLibrary, validInputs, writeLibrary } from '../src/lib/scenarios.ts';
+import { DEFAULT_MISSION } from '../src/lib/mission.ts';
+import { appendSite } from '../src/lib/sites.ts';
+const inputs = () => ({ sites: appendSite([], { latitude: -85, longitude: 0 }, 'site1'), period: { start: '2026-09-27T00:00', end: '2026-10-04T00:00' }, mission: { ...DEFAULT_MISSION } });
+const stamp = '2026-11-06T12:00:00.000Z';
+test('saved scenarios round-trip all mission settings without aliasing originals or copies', () => {
+  const original = inputs();
+  const saved = makeScenario(original, ' Reference ', 'a', stamp);
+  const duplicate = makeScenario(saved, 'Copy', 'b', stamp);
+  original.sites[0].latitude = -89; duplicate.mission.batteryWh = 4000;
+  assert.equal(saved.sites[0].latitude, -85); assert.equal(saved.mission.batteryWh, 2000);
+  const restored = parseLibrary(JSON.stringify({ version: 1, scenarios: [saved, duplicate] }));
+  assert.equal(restored.scenarios[0].name, 'Reference');
+  assert.equal(restored.scenarios[1].mission.batteryWh, 4000);
+  const loaded = copyInputs(restored.scenarios[0]); loaded.period.end = '2026-10-05T00:00';
+  assert.equal(restored.scenarios[0].period.end, '2026-10-04T00:00');
+  assert.notEqual(inputsKey(loaded), inputsKey(saved));
+});
+test('rejects corrupt, future-version, duplicate and scientifically invalid saved data', () => {
+  assert.deepEqual(parseLibrary(null), { version: 1, scenarios: [] });
+  assert.throws(() => parseLibrary('{broken'));
+  assert.throws(() => parseLibrary(JSON.stringify({ version: 2, scenarios: [] })));
+  const saved = makeScenario(inputs(), 'Test', 'a', stamp);
+  assert.throws(() => parseLibrary(JSON.stringify({ version: 1, scenarios: [saved, saved] })));
+  const bad = inputs(); bad.mission.operatingPowerW = NaN;
+  assert.equal(validInputs(bad), false);
+  assert.equal(validInputs({ ...inputs(), sites: [] }), false);
+  assert.equal(validInputs({ ...inputs(), sites: [inputs().sites[0], inputs().sites[0]] }), false);
+  assert.equal(validInputs({ ...inputs(), mission: {} }), false);
+  assert.throws(() => makeScenario(inputs(), ' ', 'a', stamp));
+});
+test('storage writes are atomic and detect other-tab changes before replacing saved data', () => {
+  let raw: string | null = null;
+  const storage = { getItem: () => raw, setItem: (_: string, value: string) => { raw = value; } };
+  const library = { version: 1 as const, scenarios: [makeScenario(inputs(), 'Test', 'a', stamp)] };
+  const saved = writeLibrary(storage, null, library);
+  assert.equal(parseLibrary(raw).scenarios.length, 1);
+  assert.throws(() => writeLibrary(storage, null, { version: 1, scenarios: [] }), /storage-conflict/);
+  assert.equal(raw, saved);
+  assert.throws(() => writeLibrary({ getItem: () => raw, setItem: () => { throw new Error('quota'); } }, saved, library), /quota/);
+  assert.equal(raw, saved);
+});

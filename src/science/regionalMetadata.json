@@ -1,0 +1,23 @@
+{
+  "id": "lola-80s-80m-crop-v1",
+  "source": "https://imbrium.mit.edu/DATA/LOLA_GDR/POLAR/IMG/LDEM_80S_80M.IMG",
+  "label": "https://imbrium.mit.edu/DATA/LOLA_GDR/POLAR/IMG/LDEM_80S_80M.LBL",
+  "frame": "MOON_ME / DE421",
+  "radiusM": 1737400,
+  "width": 3000,
+  "height": 3000,
+  "x0": -119960.0,
+  "y0": 119960.0,
+  "spacingM": 80,
+  "scaleM": 0.5,
+  "format": "Int16LE",
+  "cropStartRow": 2300,
+  "cropStartColumn": 2300,
+  "sourceWidth": 7600,
+  "rangeM": 100000,
+  "minM": -5219.5,
+  "maxM": 6798.5,
+  "sourceSha256": "e6591eeea35402ca5e124ca00f5bf0774381a2d4fa919144b455d82b8ff65fdc",
+  "labelSha256": "107c7558cbf8832e4119d3c8c2b1b272623344275c85378a9b0e03c22876eb33",
+  "sha256": "f9cf26705a12519b0373633a5e37742012fcffd2cc62dd3da7c2946b2076292c"
+}

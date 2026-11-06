@@ -7,6 +7,16 @@ const AU_KM = 149597870.7;
 const RAD = Math.PI / 180;
 const dot = (a: Vec3, b: Vec3) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 
+/** Geometric Moon-centered vectors in J2000, kilometres, before lunar rotation. */
+export function inertialLunarEphemeris(timestamp: number): { sun: Vec3; earth: Vec3 } {
+  const time = MakeTime(new Date(timestamp));
+  const moon = GeoMoon(time), earth = HelioVector(Body.Earth, time);
+  return {
+    earth: [-moon.x * AU_KM, -moon.y * AU_KM, -moon.z * AU_KM],
+    sun: [(-earth.x - moon.x) * AU_KM, (-earth.y - moon.y) * AU_KM, (-earth.z - moon.z) * AU_KM],
+  };
+}
+
 /** Right-handed lunar body frame: X at 0° longitude, Y at 90° east, Z north.
  * This scientific frame differs from the Three.js display frame (+Y north).
  * IAU node = intersection of lunar and J2000 equators; W advances eastward.

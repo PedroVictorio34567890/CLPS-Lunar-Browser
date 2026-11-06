@@ -18,7 +18,7 @@ export interface MissionRequirements {
   panelAzimuthDeg: number;
 }
 export type Metric = { status: 'pending'; value: null } | { status: 'calculated'; value: number };
-export interface ElevationSample { time: number; sun: number; earth: number; sunAzimuth?: number | null }
+export interface ElevationSample { time: number; sun: number; earth: number; sunAzimuth?: number | null; sunClearance?: number }
 export interface EnergyReport {
   samples: { time: number; chargeWh: number }[];
   generatedWh: number; demandWh: number; spilledWh: number; unservedWh: number;
@@ -32,7 +32,9 @@ export interface SiteSeries {
   sunlight: VisibilityWindow[];
   earthVisibility: VisibilityWindow[];
 }
+export interface TerrainSkySample { time: number; sun: [number, number, number]; earth: [number, number, number] }
 export interface SiteReport {
+  terrain?: { status: 'outside' | 'unavailable' | 'frame-outside' } | { status: 'local'; series: SiteSeries; accessWindows: VisibilityWindow[]; energy: EnergyReport; sky: TerrainSkySample[]; rangeM: number; localProfile: { azimuth: number; elevation: number }[]; nearAccessPercent: number; nearOutageHours: number; geometricOutageHours: number; elevationM: number; profile: { azimuth: number; elevation: number }[]; sunlightPercent: number; accessPercent: number; longestOutageHours: number; minChargePercent: number; unservedWh: number; jointPercent: number };
   energy?: EnergyReport;
   site: CandidateSite;
   sunlightPercent: Metric;

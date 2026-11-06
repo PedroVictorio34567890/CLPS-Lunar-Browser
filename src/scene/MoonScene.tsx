@@ -5,7 +5,7 @@ import { Canvas, useThree } from '@react-three/fiber';
 import { Line, OrbitControls, useTexture } from '@react-three/drei';
 import { CanvasTexture, Mesh, SRGBColorSpace, Vector3, Quaternion, MOUSE, TOUCH } from 'three';
 import { RotateCcw, MousePointer2, ScanLine, AlertTriangle } from 'lucide-react';
-import type { CandidateSite, Coordinates } from '../models';
+import type { CandidateSite, Coordinates, SiteReport } from '../models';
 import { geographicToCartesian, cartesianToGeographic } from '../lib/coordinates';
 import { Sun } from './Sun';
 import { Earth } from './Earth';
@@ -71,7 +71,7 @@ function Moon({ sites, onSelect, canSelect }: { sites: CandidateSite[]; onSelect
     {sites.map(site => <PinLabel key={site.id} site={site}/>)}
   </group>;
 }
-export function MoonScene({ sites, onSelect, timestamp, surfaceSite }: { sites: CandidateSite[]; onSelect: (c: Coordinates) => void; timestamp: number; surfaceSite?: CandidateSite }) {
+export function MoonScene({ sites, onSelect, timestamp, surfaceSite, surfaceReport }: { sites: CandidateSite[]; onSelect: (c: Coordinates) => void; timestamp: number; surfaceSite?: CandidateSite; surfaceReport?: SiteReport }) {
   useLanguage();
   const bodies = useMemo(() => sceneEphemeris(timestamp), [timestamp]);
   const [automatic, setAutomatic] = useState(true);
@@ -93,6 +93,6 @@ export function MoonScene({ sites, onSelect, timestamp, surfaceSite }: { sites: 
     </div>
     <div className="scene-bottom"><div className="gesture-hint"><MousePointer2 size={15}/><span>{t("Pulsa para marcar")} <b>·</b>  {t("Arrastra para orbitar")} <b>·</b>  {t("Rueda o pellizca para zoom")}</span></div><button className="reset-button" onClick={() => { setResetKey(k => k + 1); setAutomatic(true); }}><RotateCcw size={14}/>  {t("Restablecer vista")}</button></div>
     <div className="scene-caption"><span><ScanLine size={12}/>  {t("Tierra–Luna a escala real · efemérides UTC")}</span><span>{t("Iluminación sobre esfera")}</span></div>
-    {surfaceSite && <SceneBoundary><SurfaceView key={surfaceSite.id + ':' + surfaceSite.latitude + ':' + surfaceSite.longitude} site={surfaceSite} timestamp={timestamp}/></SceneBoundary>}
+    {surfaceSite && <SceneBoundary><SurfaceView key={surfaceSite.id + ':' + surfaceSite.latitude + ':' + surfaceSite.longitude} site={surfaceSite} timestamp={timestamp} report={surfaceReport}/></SceneBoundary>}
   </section>;
 }
