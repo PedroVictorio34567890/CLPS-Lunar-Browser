@@ -1,6 +1,9 @@
 import { t, locale, useLanguage } from '../i18n';
 import { useEffect, useRef } from 'react';
 import { X, Sun, Radio, Info } from 'lucide-react';
+import { RadioAssessment } from './RadioAssessment';
+import { LandingAssessment } from './LandingAssessment';
+import { DataAssessment } from './DataAssessment';
 import { TerrainAssessment } from './TerrainAssessment';
 import type { ComparisonReport, Metric } from '../models';
 import { formatCoordinates } from '../i18n';
@@ -27,7 +30,7 @@ export function ComparisonPanel({ report, onClose }: { report: ComparisonReport;
     {report.methodology && <details className="methodology"><summary>{t("Modelo, precisión e índice exploratorio")}</summary><p>{t(report.methodology.ephemeris)}</p><p>{report.methodology.sampleCount.toLocaleString(locale())}  {t("muestras por lugar · paso máximo")} {report.methodology.stepMinutes} min.</p><p><strong>{t(report.methodology.scoreFormula)}</strong></p><ul>{report.methodology.assumptions.map(a => <li key={t(a)}>{t(a)}</li>)}</ul><a href="https://github.com/cosinekitty/astronomy" target="_blank" rel="noreferrer">Astronomy Engine ↗</a> · <a href="https://ssd.jpl.nasa.gov/horizons/manual.html" target="_blank" rel="noreferrer">{t("Referencia de contraste: JPL Horizons ↗")}</a></details>}
     {report.sites.map(r => <article key={r.site.id} className="report-card" style={{ borderTopColor: r.site.color }}>
       <header><span className="site-number" style={{ color: r.site.color, backgroundColor: `${r.site.color}15` }}>{r.site.slot + 1}</span><div><h3>{t("Lugar")} {String(r.site.slot + 1).padStart(2, '0')}</h3><span className="coords">{formatCoordinates(r.site)}</span></div></header>
-      <TerrainAssessment site={r} mission={report.mission}/>
+      {report.mission && <><RadioAssessment site={r} mission={report.mission}/><DataAssessment site={r} mission={report.mission}/></>}<TerrainAssessment site={r} mission={report.mission}/><LandingAssessment site={r}/>
       <h4>{en ? 'Spherical reference · without terrain' : 'Referencia esférica · sin relieve'}</h4>
       {report.mission && <><h4><Radio size={14}/>  {t("Prioridad: requisitos de comunicación")}</h4><CommunicationAssessment site={r} mission={report.mission}/></>}
       {report.mission && <OperationalAssessment site={r} mission={report.mission}/>}

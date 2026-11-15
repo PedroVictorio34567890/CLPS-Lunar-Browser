@@ -1,5 +1,11 @@
 // Spanish source messages and their English equivalents, including scientific caveats.
 export const english: Record<string, string> = {
+  'Revisa el radio de estudio y los límites de pendiente y desnivel.': 'Check the study radius, slope limit and elevation range limit.',
+  'Geometría sin eclipses, tamaño angular de discos, atmósfera terrestre, relés ni antenas. La energía, si hay requisitos, se evalúa por separado con pérdidas y límites de batería configurables.': 'Geometry excludes eclipses, angular disk size, Earth atmosphere, relays and antennas. Energy is evaluated separately with configurable battery losses and power limits.',
+  'Consumo medio constante. El resto del tiempo usa consumo en reposo. Factor útil: 100% sin pérdidas de generación; pérdidas y límites de batería configurables en el bloque siguiente. Panel fijo: 0° horizontal, 90° vertical; azimut N=0°, E=90°.': 'Constant average load. The remaining time uses standby consumption. Useful factor: 100% means no generation losses; battery losses and limits are configured below. Fixed panel: 0° horizontal, 90° vertical; azimuth N=0°, E=90°.',
+  'Pérdidas de batería': 'Battery losses',
+  'Revisa las eficiencias y los límites de potencia de la batería.': 'Check battery efficiencies and power limits.',
+  'Revisa la generación de datos, la memoria y la eficiencia de transmisión.': 'Check data generation, storage and transmission efficiency.',
   'Lunar Mission Browser, inicio': 'Lunar Mission Browser, home',
   'Exploración del polo sur': 'South pole exploration',
   'PROTOTIPO · V0.2': 'PROTOTYPE · V0.2',
@@ -203,6 +209,7 @@ export const english: Record<string, string> = {
   'Respuesta de cálculo inválida.': 'Invalid calculation response.',
   'No se pudo completar el cálculo.': 'The calculation could not be completed.',
   'Completa todos los requisitos con números válidos.': 'Complete all requirements with valid numbers.',
+  'Revisa los parámetros de radio y de la estación terrestre.': 'Check the radio and ground station parameters.',
   'La elevación mínima debe estar entre 0° y menos de 90°.': 'Minimum elevation must be at least 0° and less than 90°.',
   'Los porcentajes deben estar entre 0 y 100.': 'Percentages must be between 0 and 100.',
   'La interrupción máxima no puede ser negativa.': 'Maximum outage cannot be negative.',

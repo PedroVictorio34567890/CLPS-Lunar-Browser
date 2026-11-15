@@ -2,6 +2,10 @@ export interface Coordinates { latitude: number; longitude: number }
 export interface CandidateSite extends Coordinates { id: string; slot: number; color: string }
 export interface AnalysisPeriod { start: string; end: string }
 export interface MissionRequirements {
+  landing?: import('./science/landingTerrain').LandingSettings;
+  battery?: import('./science/batterySettings').BatterySettings;
+  data?: import('./science/dataStorage').DataSettings;
+  radio?: import('./science/radioBudget').RadioSettings;
   minEarthElevationDeg: number;
   minAvailabilityPercent: number;
   maxOutageHours: number;
@@ -18,8 +22,9 @@ export interface MissionRequirements {
   panelAzimuthDeg: number;
 }
 export type Metric = { status: 'pending'; value: null } | { status: 'calculated'; value: number };
-export interface ElevationSample { time: number; sun: number; earth: number; sunAzimuth?: number | null; sunClearance?: number }
+export interface ElevationSample { solarDistanceKm?: number; time: number; sun: number; earth: number; sunAzimuth?: number | null; sunClearance?: number }
 export interface EnergyReport {
+  batteryLossWh?: number;
   samples: { time: number; chargeWh: number }[];
   generatedWh: number; demandWh: number; spilledWh: number; unservedWh: number;
   minChargeWh: number; finalChargeWh: number; loadW: number;
@@ -34,6 +39,9 @@ export interface SiteSeries {
 }
 export interface TerrainSkySample { time: number; sun: [number, number, number]; earth: [number, number, number] }
 export interface SiteReport {
+  landing?: import('./science/landingTerrain').LandingResult;
+  data?: {status:'unavailable'} | ({status:'calculated';model:'terrain'|'sphere'} & import('./science/dataStorage').DataStorageResult);
+  radio?: {status:'unavailable'} | {status:'calculated'; model:'terrain'|'sphere'; minMarginDb:number; maxMarginDb:number; minRateKbps:number; minRangeKm:number; maxRangeKm:number; geometricPercent:number; linkPercent:number; poweredPercent:number; longestOutageHours:number; windows:VisibilityWindow[]; worst: ReturnType<typeof import('./science/radioBudget').radioBudget>};
   terrain?: { status: 'outside' | 'unavailable' | 'frame-outside' } | { status: 'local'; series: SiteSeries; accessWindows: VisibilityWindow[]; energy: EnergyReport; sky: TerrainSkySample[]; rangeM: number; localProfile: { azimuth: number; elevation: number }[]; nearAccessPercent: number; nearOutageHours: number; geometricOutageHours: number; elevationM: number; profile: { azimuth: number; elevation: number }[]; sunlightPercent: number; accessPercent: number; longestOutageHours: number; minChargePercent: number; unservedWh: number; jointPercent: number };
   energy?: EnergyReport;
   site: CandidateSite;

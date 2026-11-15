@@ -21,6 +21,9 @@ export function summarizeScenario(scenario: SavedScenario, report: ComparisonRep
     return {
       id: `${scenario.id}/${site.site.id}`, scenario, site: site.site,
       model: active.model, modelReason: active.reason,
+      landing: site.landing,
+      radio: site.radio?.status === 'calculated' ? site.radio : null,
+      data: site.data?.status === 'calculated' ? site.data : null,
       geometricPercent: active.geometricPercent, jointPercent: joint.percent,
       longestOutageHours: joint.longestOutageHours, sunlightPercent: active.sunlightPercent,
       minChargePercent: energy.minChargeWh / scenario.mission.batteryWh * 100,

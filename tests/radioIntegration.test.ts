@@ -1,0 +1,45 @@
+import { addDataAssessment } from '../src/science/dataAssessment.ts';
+import { simulateDataStorage, DEFAULT_DATA } from '../src/science/dataStorage.ts';
+import { activeAnalysis } from '../src/lib/activeAnalysis.ts';
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { build } from 'vite';
+import { sphericalEngine } from '../src/science/sphericalEngine.ts';
+import { DEFAULT_MISSION } from '../src/lib/mission.ts';
+import { DEFAULT_RADIO } from '../src/science/radioBudget.ts';
+import { appendSite } from '../src/lib/sites.ts';
+import type { ComparisonReport } from '../src/models.ts';
+const bundle=await build({configFile:false,logLevel:'silent',build:{write:false,minify:false,lib:{entry:'tests/fixtures/radio-entry.ts',formats:['es']}}});
+if ('close' in bundle) throw new Error('watch build');
+const output=(Array.isArray(bundle)?bundle[0]:bundle).output.find(item=>item.type==='chunk');
+if (!output || output.type!=='chunk') throw new Error('no bundle');
+const {addTerrainAssessment,addRadioAssessment}=await import(`data:text/javascript;base64,${Buffer.from(output.code).toString('base64')}`) as {addTerrainAssessment:(r:ComparisonReport)=>Promise<void>;addRadioAssessment:(r:ComparisonReport)=>Promise<void>};
+const period={start:'2026-11-08T00:00',end:'2026-11-09T00:00'};
+test('station and lunar horizons gate strong radio; weak RF cannot pass on geometry alone',async()=>{
+  const sites=appendSite([],{latitude:0,longitude:0},'test');
+  const strong=await sphericalEngine.compare(sites,period,{...DEFAULT_MISSION,radio:{...DEFAULT_RADIO,transmitGainDbi:50,receiveGainDbi:70}});
+  await addRadioAssessment(strong);
+  const a=strong.sites[0].radio; assert.equal(a?.status,'calculated');
+  if(a?.status!=='calculated') return;
+  assert.ok(a.geometricPercent>0 && a.geometricPercent<100);
+  assert.equal(a.linkPercent,a.geometricPercent); assert.ok(a.poweredPercent<=a.linkPercent);
+  addDataAssessment(strong);
+  assert.deepEqual(strong.sites[0].data,{status:'calculated',model:'sphere',...simulateDataStorage(a.windows,activeAnalysis(strong.sites[0],strong.mission!).energy!.outages,DEFAULT_RADIO.dataRateKbps,DEFAULT_DATA)});
+  const weak=await sphericalEngine.compare(sites,period,{...DEFAULT_MISSION,radio:{...DEFAULT_RADIO,transmitPowerW:0.000001,transmitGainDbi:-30,receiveGainDbi:-30}});
+  await addRadioAssessment(weak);
+  const b=weak.sites[0].radio; assert.equal(b?.status,'calculated');
+  if(b?.status==='calculated') {assert.equal(b.geometricPercent,a.geometricPercent);assert.equal(b.linkPercent,0);assert.ok(b.maxMarginDb<0);}
+});
+test('radio uses verified MOON_ME terrain, and fails explicitly if its rotation data cannot load',async t=>{
+  t.mock.method(globalThis,'fetch',async(url:string)=>new Response(readFileSync(new URL(`../public${url}`,import.meta.url))));
+  const metadata=JSON.parse(readFileSync(new URL('../src/science/terrainMetadata.json',import.meta.url),'utf8'));
+  const report=await sphericalEngine.compare(appendSite([],metadata.demo,'lola'),period,DEFAULT_MISSION);
+  await addTerrainAssessment(report); await addRadioAssessment(report);
+  addDataAssessment(report);assert.equal(report.sites[0].data?.status,'calculated');
+  if(report.sites[0].data?.status==='calculated') assert.equal(report.sites[0].data.model,'terrain');
+  assert.equal(report.sites[0].radio?.status,'calculated');
+  if(report.sites[0].radio?.status==='calculated') assert.equal(report.sites[0].radio.model,'terrain');
+  t.mock.method(globalThis,'fetch',async()=>new Response(null,{status:404}));
+  await addRadioAssessment(report);assert.equal(report.sites[0].radio?.status,'unavailable');
+});

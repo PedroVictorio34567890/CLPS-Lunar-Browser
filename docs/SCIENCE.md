@@ -1,5 +1,7 @@
 # Modelo geométrico spherical-v1
 
+La integración de QuickMap, Moon Trek, Horizons y CSA, revisada el 14 de noviembre de 2026, está documentada en [OFFICIAL_RESOURCES.md](OFFICIAL_RESOURCES.md). El mapa WMTS es contexto visual; el contraste Horizons es independiente y no reemplaza este motor ni añade cobertura de relés.
+
 ## Alcance
 
 Estimación exploratoria de iluminación y visibilidad del centro terrestre sobre una esfera. Los resultados dependen de las coordenadas y del periodo, no de la orientación de la cámara. No son valores simulados ni aleatorios. No es todavía un análisis con relieve de emplazamientos polares.
@@ -163,3 +165,57 @@ Los contadores usan esas ventanas sin añadir eventos en los límites del period
 La vista de superficie consume el informe vigente y muestra una silueta angular opaca del perfil de 100 km, con suelo esférico bajo 0°. Su radio de dibujo es arbitrario: no representa distancias reales a montañas ni una malla topográfica. Se interpolan linealmente los vectores topocéntricos del informe entre muestras de 5 minutos, evitando discontinuidades de azimut en el norte. Fuera del intervalo no se extrapolan. La lectura de elevación es física; la obstrucción se consulta al azimut del cuerpo. Cerca de un cruce puede haber pequeñas diferencias respecto a los contadores, que interpolan la distancia angular al horizonte. No se simulan eclipses; los discos y halos son visuales y las métricas se refieren a sus centros.
 
 Cambiar lugares, coordenadas, periodo o requisitos invalida `currentReport` y retira el relieve de la superficie y de los contadores hasta analizar otra vez. La vista orbital conserva la esfera y su orientación analítica; solo la vista de superficie usa los vectores MOON_ME del informe. El informe muestra primero el bloque LOLA, seguido de una referencia esférica identificada. Se verifican selección del modelo, conservación de las referencias, integración con escenarios y energía, interpolación del cielo, orientación cardinal y cierre de la silueta.
+
+## Presupuesto de radio y estación terrestre (2026-11-08)
+
+Se añade un enlace descendente unidireccional desde el candidato lunar hasta una estación terrestre configurable. Las coordenadas iniciales (40° N, 4° O, altura elipsoidal 600 m) y todos los valores de radio son ejemplos de usuario; no son especificaciones de una estación DSN ni frecuencias autorizadas para una misión. Las ganancias en dBi suponen antenas siguiendo la dirección de la contraparte. La frecuencia no recalcula la ganancia: el usuario debe aportar ganancias válidas para su equipo y frecuencia.
+
+Para cada muestra de 5 minutos, `ObserverVector(..., false)` de Astronomy Engine proporciona la posición terrestre en J2000 (incluida la rotación terrestre). Se suma al vector Luna→Tierra y se transforma al mismo marco que el candidato: MOON_ME_DE421 con relieve o IAU para la referencia esférica. Se resta la posición lunar a su altura. La normal geodésica terrestre se obtiene por diferencia entre posiciones de la estación a dos alturas y se rota con la misma transformación. La línea estación→candidato se proyecta sobre esa normal: se comprueba el horizonte de la estación y no solo la visibilidad del centro terrestre desde la Luna. La altura terrestre está referida al elipsoide usado por Astronomy Engine; no hay relieve de la estación ni refracción.
+
+Presupuesto (unidades internas SI):
+
+```
+EIRP[dBW] = 10 log10(P_RF[W]) + Gtx[dBi]
+FSPL[dB] = 20 log10(4π distancia[m] frecuencia[Hz] / 299792458)
+Pr[dBW] = EIRP − FSPL − pérdidas_adicionales + Grx
+N0[dBW/Hz] = 10 log10(1.380649e−23 × T_sistema[K])
+C/N0[dB-Hz] = Pr − N0
+Eb/N0[dB] = C/N0 − 10 log10(tasa_información[bit/s])
+margen_adicional[dB] = Eb/N0 − Eb/N0_requerido − reserva_diseño
+tasa_techo[bit/s] = 10^((C/N0 − Eb/N0_requerido − reserva_diseño)/10)
+```
+
+El Eb/N0 requerido es una entrada del módem/codificación/tasa de errores; no se supone una modulación ni ganancia de codificación universal. Las pérdidas adicionales agrupan cables, polarización, apuntamiento, atmósfera e implementación y se descuentan una sola vez. Ruido, ganancias y pérdidas son constantes. El margen positivo debe superar la reserva de diseño; igualdad exacta es el umbral, no una ventana abierta. El mínimo/máximo del margen y el techo de tasa se calculan hipotéticamente a lo largo del periodo aun cuando el trayecto esté bloqueado: **no son disponibilidad ni volumen entregado**.
+
+Las ventanas exigen que el candidato supere tanto el horizonte lunar (incluido LOLA si procede) como el umbral de misión en dirección a la estación, y que la estación vea el candidato sobre su elevación mínima. Se interpolan sus cruces y los del margen de radio, se intersectan esas ventanas y, por separado, se excluyen déficits de energía. El informe distingue geometría, geometría+RF y geometría+RF+energía; el máximo corte combinado se recorta al periodo. El contador de radio usa geometría+RF sin batería. Los contadores de centro terrestre conservan su significado anterior.
+
+No se convierte potencia RF en consumo eléctrico: el usuario debe incluir amplificador, electrónica y radio en el consumo de misión. La energía sigue siendo el balance ideal de carga media. No se modelan agenda de estación, clima variable, interferencias, Doppler/adquisición, bloqueo de portadora, enlace ascendente, protocolos, relés o disponibilidad de una red. Si falla la orientación necesaria para un sitio LOLA, el cálculo de radio de ese sitio queda no disponible; no se sustituye su marco en silencio.
+
+Los escenarios conservan una copia independiente de la configuración de radio. Los antiguos sin ese campo reciben los valores de ejemplo al cargarse. Cambios en cualquiera de estos parámetros invalidan el informe actual. El comparador añade una tabla específica de radio, dejando las métricas geométricas anteriores como referencia. Fuentes: [NASA/JPL Telecommunications Link Design Handbook](https://deepspace.jpl.nasa.gov/dsndocs/810-005/) y [JPL, diseño de enlaces y umbrales del canal de datos](https://tmo.jpl.nasa.gov/2010-2019/progress_report/42-208/208B.pdf).
+
+Validación añadida: fórmula independiente de FSPL, variaciones de 3/6 dB al cambiar potencia/tasa/ruido/distancia, techo de tasa, rechazo de entradas inválidas, contraste del horizonte terrestre con Equator/Horizon (centro lunar frente a sitio de superficie, tolerancia 0,35°), ventanas limitadas por rotación terrestre, enlace débil con geometría positiva, orientación LOLA verificada y fallo de carga explícito, compatibilidad y aislamiento de escenarios antiguos.
+# Almacenamiento durante cortes (enlace directo)
+
+Se cruzan las ventanas de geometría + margen RF de la estación con los déficits del modelo energético activo (LOLA donde hay cobertura, esfera identificada en el resto). Sin resultados de radio o energía, el almacenamiento se marca como no disponible.
+
+La generación es constante mientras se cubre toda la carga de misión. La descarga útil es la tasa de radio configurada multiplicada por la eficiencia de carga útil; no se usa el techo teórico de tasa RF. Ambas se detienen durante déficits energéticos, conservando el contenido de memoria no volátil. El consumo de instrumentos y radio debe estar incluido en la carga configurada. MB y kbit son decimales: MB/s = kbit/s / 8000.
+
+Se integra una cola fluida FIFO por intervalos delimitados por cambios de enlace o energía. Con memoria llena se descartan los datos nuevos. Se cumple: datos iniciales + generados = transmitidos + descartados + pendientes. Los datos potenciales no generados por falta de energía se informan aparte. La cola equivalente de capacidad ilimitada determina la memoria mínima para evitar pérdidas en ese periodo, sin reserva de seguridad. La gráfica incluye los instantes de llenado y vaciado.
+
+No hay prioridad de paquetes, retransmisiones explícitas, compresión dinámica, fallos de memoria ni adaptación de tasa. Los datos pendientes al final no se consideran perdidos. Los parámetros de ejemplo se guardan en escenarios; los antiguos reciben valores por defecto. Los relés quedan pendientes de órbitas y ventanas de servicio reales: no se presupone su cobertura.
+
+
+## Actualización energética: distancia y batería no ideal
+
+Esta sección sustituye las hipótesis previas de batería ideal y distancia solar constante. Referencia física: [NASA, Power subsystems](https://www.nasa.gov/smallsat-institute/sst-soa/power-subsystems/). La potencia nominal se refiere a incidencia normal a 1 UA. Se multiplica por (149597870,7 / distancia Sol–Luna en km)², por incidencia y por factor útil. La distancia se calcula con las efemérides existentes y se interpola en el punto medio; no es un reemplazo por Horizons. La diferencia de distancia entre centro lunar y superficie se desprecia. Las series sintéticas sin distancia usan 1 UA. Las sombras locales siguen cortando la generación cuando el centro solar está oculto.
+
+Las eficiencias de carga ηc y descarga ηd son constantes configurables, en (0,1]. Los límites de potencia se definen en el bus: entrada del cargador y salida hacia la carga. Cero equivale a ilimitado. Con excedente S y duración h, se almacena min(capacidad libre, min(S,Pc)·ηc·h); pérdidas = entrada − energía almacenada. Con déficit D se entrega min(D,Pd) hasta que la batería se vacía, extrayendo potencia entregada / ηd. La demanda no cubierta incluye insuficiencia de potencia aun con batería cargada. Los eventos de reserva/vaciado y saturación se interpolan dentro de cada tramo constante.
+
+Conservación: carga inicial + generación − demanda + demanda no cubierta − excedente − pérdidas = carga final. Los cortes energéticos se transmiten a disponibilidad de radio y almacenamiento de datos. Los escenarios guardan copias independientes de los nuevos ajustes; los antiguos adoptan valores ideales. El cambio de distancia puede modificar resultados anteriores al recalcular.
+
+Pendientes: eclipses, fracción visible del disco solar, autoconsumo/temperatura/degradación de batería, calentadores y actividades programadas. No se declara completado todo el refinamiento físico del punto 5.
+
+
+## Evaluación estática de terreno
+
+El análisis de pendientes y desniveles del punto 6 se documenta en [TERRAIN_SCREENING.md](TERRAIN_SCREENING.md). Usa los DEM numéricos verificados, con resolución explícita; no usa el sombreado WMTS como elevaciones ni sustituye las métricas de iluminación y comunicaciones.

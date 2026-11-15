@@ -13,7 +13,7 @@ export const STEP_MINUTES = 5;
 const metric = (value: number): Metric => ({ status: 'calculated', value });
 export const sphericalEngine: ScienceEngine = {
   async compare(inputSites, inputPeriod, inputMission) {
-    const mission = inputMission ? { ...inputMission } : undefined;
+    const mission = inputMission ? { ...inputMission, ...(inputMission.landing ? {landing:{...inputMission.landing}} : {}), ...(inputMission.battery ? {battery:{...inputMission.battery}} : {}), ...(inputMission.radio ? {radio:{...inputMission.radio}} : {}), ...(inputMission.data ? {data:{...inputMission.data}} : {}) } : undefined;
     if (mission && missionError(mission)) throw new Error(missionError(mission)!);
     const sites = inputSites.map(site => ({ ...site }));
     const period = { ...inputPeriod };
@@ -27,7 +27,7 @@ export const sphericalEngine: ScienceEngine = {
     for (let index = 0; index <= steps; index++) {
       const time = Math.min(end, start + index * STEP_MINUTES * 60000);
       const { sun, earth } = lunarEphemeris(time);
-      sites.forEach((site, i) => series[i].push({ time, sun: elevation(site, sun), earth: elevation(site, earth), sunAzimuth: localSky(site, sun).azimuth }));
+      sites.forEach((site, i) => series[i].push({ time, solarDistanceKm: Math.hypot(...sun), sun: elevation(site, sun), earth: elevation(site, earth), sunAzimuth: localSky(site, sun).azimuth }));
     }
     const report: ComparisonReport = {
       engine: 'spherical-v1', period, mission,
@@ -39,7 +39,7 @@ export const sphericalEngine: ScienceEngine = {
           'Esfera de radio 1737,4 km, altura del observador 0 m y horizonte plano a 0°. Sin DEM, pendientes ni sombras de cráteres o montañas.',
           'Luz: centro del Sol por encima de 0°. Comunicación: centro de la Tierra por encima de 0°; no representa una estación terrestre ni garantiza un enlace de radio.',
           'Vectores geométricos simultáneos J2000 convertidos al marco lunar IAU; UTC de entrada y conversión interna a TT. Sin correcciones de tiempo de luz ni aberración.',
-          'Geometría sin eclipses, tamaño angular de discos, atmósfera terrestre, relés ni antenas. La energía, si hay requisitos, se evalúa por separado con batería ideal.',
+          'Geometría sin eclipses, tamaño angular de discos, atmósfera terrestre, relés ni antenas. La energía, si hay requisitos, se evalúa por separado con pérdidas y límites de batería configurables.',
           'Cruces de horizonte interpolados entre muestras de 5 min. Eventos más cortos pueden omitirse; no equivale a una precisión científica de 5 min.',
           'Las duraciones continuas están recortadas al periodo seleccionado; pueden prolongarse fuera de él.',
         ],

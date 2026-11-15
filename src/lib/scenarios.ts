@@ -3,6 +3,10 @@ import { missionError, DEFAULT_MISSION } from './mission.ts';
 import { periodError } from './period.ts';
 import { validCoordinates } from './coordinates.ts';
 import { MAX_SITES, SITE_COLORS } from './sites.ts';
+import { DEFAULT_RADIO } from '../science/radioBudget.ts';
+import { DEFAULT_LANDING } from '../science/landingTerrain.ts';
+import { DEFAULT_BATTERY } from '../science/batterySettings.ts';
+import { DEFAULT_DATA } from '../science/dataStorage.ts';
 
 export const SCENARIO_KEY = 'lunar-mission-scenarios-v1';
 export interface ScenarioInputs { sites: CandidateSite[]; period: AnalysisPeriod; mission: MissionRequirements }
@@ -28,7 +32,7 @@ export function copyInputs(value: ScenarioInputs): ScenarioInputs {
   return {
     sites: value.sites.map(s => ({ id: s.id, slot: s.slot, color: s.color, latitude: s.latitude, longitude: s.longitude })),
     period: { start: value.period.start, end: value.period.end },
-    mission: Object.fromEntries(Object.keys(DEFAULT_MISSION).map(key => [key, value.mission[key as keyof MissionRequirements]])) as unknown as MissionRequirements,
+    mission: Object.fromEntries(Object.keys(DEFAULT_MISSION).map(key => [key, key === 'landing' ? {...(value.mission.landing ?? DEFAULT_LANDING)} : key === 'battery' ? {...(value.mission.battery ?? DEFAULT_BATTERY)} : key === 'radio' ? {...(value.mission.radio ?? DEFAULT_RADIO)} : key === 'data' ? {...(value.mission.data ?? DEFAULT_DATA)} : value.mission[key as keyof MissionRequirements]])) as unknown as MissionRequirements,
   };
 }
 export const inputsKey = (value: ScenarioInputs) => JSON.stringify(copyInputs(value));

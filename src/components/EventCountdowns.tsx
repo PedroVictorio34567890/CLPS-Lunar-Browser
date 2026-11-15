@@ -14,11 +14,13 @@ export function EventCountdowns({ report, time }: { report?: ComparisonReport; t
   const earth = active?.series ? nextEvents(active.series.earthVisibility, time) : null;
   const access = active?.accessWindows ? nextEvents(active.accessWindows, time) : null;
   const terrain = active?.model === 'terrain';
+  const radio = site?.radio?.status === 'calculated' ? site.radio : null;
   const groups = [
     { title: terrain ? (en ? 'Sun · terrain horizon' : 'Sol · horizonte del relieve') : (en ? 'Sun · center at 0°' : 'Sol · centro a 0°'), events: sun, rise: en ? 'Next sunrise' : 'Próxima salida', set: en ? 'Next sunset' : 'Próxima puesta' },
     { title: terrain ? (en ? 'Earth · terrain horizon' : 'Tierra · horizonte del relieve') : (en ? 'Earth · center at 0°' : 'Tierra · centro a 0°'), events: earth, rise: en ? 'Next Earthrise' : 'Próxima salida', set: en ? 'Next Earthset' : 'Próxima puesta' },
     { title: `${en ? 'Geometric access' : 'Acceso geométrico'} · > ${report?.mission?.minEarthElevationDeg ?? 0}°`, events: access, rise: en ? 'Access recovery' : 'Recuperación del acceso', set: en ? 'Access loss' : 'Pérdida del acceso' },
   ];
+  if (radio) groups.push({title:en?'Station link · geometry + RF':'Enlace con estación · geometría + RF',events:nextEvents(radio.windows,time),rise:en?'Link recovery':'Recuperación del enlace',set:en?'Link loss':'Pérdida del enlace'});
   function countdown(event: number) {
     const delta = remainingTime(event, time);
     return `${delta.days ? `${delta.days} d · ` : ''}${delta.hours} h · ${delta.minutes} min`;
@@ -28,6 +30,7 @@ export function EventCountdowns({ report, time }: { report?: ComparisonReport; t
       {!site?.series ? <p>{en ? 'Run Analyze and compare with your current settings to calculate events. Then move the scene time to see the countdowns.' : 'Pulsa Analizar y comparar con la configuración actual para calcular los eventos. Después mueve el tiempo de la escena para ver los contadores.'}</p> : <>
         <label>{en ? 'Site for countdowns' : 'Lugar de los contadores'}<select value={site.site.id} onChange={event => setSiteId(event.target.value)}>{report!.sites.map(s => <option key={s.site.id} value={s.site.id}>{en ? 'Site' : 'Lugar'} {s.site.slot + 1} · {s.site.latitude}°, {s.site.longitude}°</option>)}</select></label>
         <p>{en ? 'From scene time' : 'Desde el instante de la escena'}: {formatInstant(time)}</p>
+        <p>{radio ? (en?'The station-link countdown includes both horizons and RF margin, not energy or station scheduling.':'El contador de enlace con estación incluye ambos horizontes y el margen RF, no energía ni agenda de estación.') : (en?'Station radio link not calculated or unavailable.':'Enlace de radio con estación sin calcular o no disponible.')}</p>
         <p><strong>{active && analysisLabel(active.reason, en)}</strong>. {terrain ? (en ? 'Access must clear both the terrain and your elevation threshold.' : 'El acceso debe superar el relieve y tu umbral de elevación.') : (en ? 'Terrain is not applied to these countdowns.' : 'Estos contadores no aplican relieve.')}</p>
         <div className="event-grid">{groups.map(group => <article key={group.title}><h3>{group.title}</h3>{(['rise', 'set'] as const).map(kind => {
           const event = group.events?.[kind];

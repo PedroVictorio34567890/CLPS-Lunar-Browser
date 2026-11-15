@@ -20,6 +20,7 @@ export function TerrainAssessment({ site, mission }: { site: SiteReport; mission
     [en ? 'Longest joint outage' : 'Mayor corte conjunto', baseline?.longestOutageHours, local.longestOutageHours, 'h'],
     [en ? 'Minimum battery' : 'Batería mínima', site.energy && mission ? site.energy.minChargeWh / mission.batteryWh * 100 : null, local.minChargePercent, '%'],
     [en ? 'Unserved demand' : 'Demanda sin cubrir', site.energy?.unservedWh, local.unservedWh, 'Wh'],
+    [en ? 'Battery losses' : 'Pérdidas de batería', site.energy?.batteryLossWh ?? 0, local.energy.batteryLossWh ?? 0, 'Wh'],
   ] as const : [];
   return <section className="terrain-assessment" aria-label={en ? 'Local LOLA terrain' : 'Relieve local LOLA'}>
     <h4>{en ? 'Local LOLA terrain · experimental' : 'Relieve local LOLA · experimental'}</h4>

@@ -65,7 +65,7 @@ export async function addTerrainAssessment(report: ComparisonReport) {
           // Minimum elevation is an absolute horizontal angle, not an extra terrain margin.
           const earthClearance = earth.elevation - Math.max(report.mission.minEarthElevationDeg, horizonAt(horizon.samples, earth.azimuth));
           nearEarthSamples.push({ time: sample.time, altitude: earth.elevation - Math.max(report.mission.minEarthElevationDeg, horizonAt(horizon.localSamples, earth.azimuth)) });
-          series.push({ time: sample.time, sun: sun.elevation, earth: earth.elevation, sunAzimuth: sun.azimuth, sunClearance });
+          series.push({ solarDistanceKm: sample.solarDistanceKm, time: sample.time, sun: sun.elevation, earth: earth.elevation, sunAzimuth: sun.azimuth, sunClearance });
           sunSamples.push({ time: sample.time, altitude: sunClearance }); earthSamples.push({ time: sample.time, altitude: earthClearance });
         }
         const light = visibilityStatistics(sunSamples), access = visibilityStatistics(earthSamples);

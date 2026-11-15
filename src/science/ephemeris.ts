@@ -22,9 +22,11 @@ export function inertialLunarEphemeris(timestamp: number): { sun: Vec3; earth: V
  * IAU node = intersection of lunar and J2000 equators; W advances eastward.
  */
 export function lunarEphemeris(timestamp: number): { sun: Vec3; earth: Vec3 } {
+  const bodies=inertialLunarEphemeris(timestamp), rotate=iauLunarRotation(timestamp);
+  return {earth:rotate(bodies.earth),sun:rotate(bodies.sun)};
+}
+export function iauLunarRotation(timestamp: number) {
   const time = MakeTime(new Date(timestamp)); // UTC input; library derives TT.
-  const moon = GeoMoon(time);
-  const earth = HelioVector(Body.Earth, time);
   const axis = RotationAxis(Body.Moon, time);
   const alpha = axis.ra * 15 * RAD, delta = axis.dec * RAD, w = axis.spin * RAD;
   const node: Vec3 = [-Math.sin(alpha), Math.cos(alpha), 0];
@@ -32,11 +34,7 @@ export function lunarEphemeris(timestamp: number): { sun: Vec3; earth: Vec3 } {
   const x = node.map((v, i) => v * Math.cos(w) + perpendicular[i] * Math.sin(w)) as Vec3;
   const y = node.map((v, i) => -v * Math.sin(w) + perpendicular[i] * Math.cos(w)) as Vec3;
   const z: Vec3 = [axis.north.x, axis.north.y, axis.north.z];
-  const bodyFixed = (v: Vec3): Vec3 => [dot(v, x) * AU_KM, dot(v, y) * AU_KM, dot(v, z) * AU_KM];
-  return {
-    earth: bodyFixed([-moon.x, -moon.y, -moon.z]),
-    sun: bodyFixed([-earth.x - moon.x, -earth.y - moon.y, -earth.z - moon.z]),
-  };
+  return (v: Vec3): Vec3 => [dot(v,x),dot(v,y),dot(v,z)];
 }
 
 /** Geometric elevation of a body's CENTER from the actual surface point.

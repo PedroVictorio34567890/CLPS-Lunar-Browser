@@ -153,4 +153,39 @@ Añadir ejemplo LOLA en Lugares candidatos coloca un punto central del DEM NASA 
 
 El derivado ocupa 2,56 MB, procede de datos de 5 m y se distribuye a 20 m; examina obstáculos cercanos hasta 3 km con observador a 2 m. Ahora se combina con un recorte regional LOLA de 80 m/píxel (18 MB) para extender el horizonte hasta 100 km. El informe compara la visibilidad terrestre y el mayor corte geométrico a 3 y 100 km. Es experimental. La orientación local usa una tabla derivada de SPICE en MOON_ME_DE421, válida entre 2000 y el 1 de enero de 2050 UTC; fuera del intervalo se informa de falta de cobertura. No es el relieve completo del polo. Los contadores, el comparador de escenarios y la vista de superficie usan LOLA donde hay cobertura y un informe vigente; el resto se identifica como esférico. La vista orbital y la referencia del informe siguen siendo esféricas. Límites y procedencia reproducible: docs/SCIENCE.md y public/terrain/README.md.
 
-Verificación actual: 66 pruebas, TypeScript y compilación de producción.
+Verificación actual: 94 pruebas, TypeScript y compilación de producción.
+
+## Enlace de radio y estación terrestre
+
+## Recursos oficiales: mapas y contraste
+
+La sección **Recursos oficiales · mapas y verificación**, al final de la aplicación, conecta los cuatro portales aportados: LROC QuickMap, NASA Moon Trek, JPL Horizons y exploración lunar de la Agencia Espacial Canadiense. Incluye un visor de relieve sombreado polar WMTS de Moon Trek con marcador por candidato, consultas Horizons con las fechas de misión, importación de JSON para contraste independiente y exportación de la revisión con sus fuentes. Está disponible en español e inglés y se explica en el tutorial.
+
+El mapa es visual y no amplía el DEM numérico de cálculo. El contraste usa ocho instantes y no certifica comunicaciones ni relés. La consulta se abre en JPL, sin incrustar su API. Detalles, límites y hoja de ruta pendiente: [docs/OFFICIAL_RESOURCES.md](docs/OFFICIAL_RESOURCES.md).
+
+### Radio y almacenamiento
+
+El punto de almacenamiento está disponible en **Requisitos de misión → Datos · almacenamiento durante cortes**. Permite configurar generación, capacidad, ocupación inicial y eficiencia útil. El informe calcula datos transmitidos, pérdidas por saturación, pendientes al finalizar, generación suspendida por falta de energía y memoria mínima necesaria, con gráfica de ocupación. Los escenarios guardan estos parámetros y permiten comparar sus resultados. La evaluación de relés sigue pendiente de datos reales de órbita y servicio.
+
+En Requisitos de misión → Enlace de radio se configuran frecuencia, potencia RF,
+ganancias, pérdidas, ruido, tasa de información, Eb/N₀ y reserva de diseño, junto
+con las coordenadas y el horizonte mínimo de una estación terrestre de ejemplo.
+El informe calcula distancia variable, pérdidas de espacio libre, margen y
+ventanas con ambos horizontes, RF y energía. El comparador y los contadores
+incorporan el enlace con estación; los escenarios antiguos reciben parámetros
+de ejemplo. No es una certificación de cobertura DSN ni un presupuesto operativo
+completo: véanse supuestos y ecuaciones en docs/SCIENCE.md.
+
+
+## Iluminación y energía: distancia solar y batería
+
+La generación se corrige por la distancia Sol–Luna mediante (1 UA / distancia)². La potencia nominal de paneles se especifica a 1 UA, con el factor útil y la incidencia aplicados por separado. Se mantienen las sombras del horizonte LOLA donde hay cobertura.
+
+En **Batería · pérdidas y límites de potencia** se configuran eficiencias de carga/descarga y límites de potencia del bus (0 = sin límite). Los escenarios antiguos reciben valores ideales (100%, sin límite). Los informes muestran pérdidas de batería separadas del excedente no almacenado; los déficits, incluso con carga restante por límite de potencia, se propagan a radio y almacenamiento. No se modelan todavía eclipses, disco solar parcial, temperatura ni envejecimiento.
+
+
+## Terreno: pendientes y desniveles (punto 6)
+
+En **Requisitos de misión → Terreno · pendientes y desniveles** se configura el radio de estudio y límites exploratorios de pendiente y desnivel. El informe calcula pendientes media/P95/máxima, porcentaje de muestras sobre el límite, desnivel total y residuos respecto a un plano ajustado, con mapa de pendientes. Se usa Site04 a 20 m cuando cabe todo el entorno, y el DEM regional de 80 m en el resto de su cobertura. La evaluación estática regional no amplía por sí sola los cálculos del horizonte de luz o radio.
+
+Hay estados explícitos de falta de cobertura, resolución insuficiente y datos no disponibles. Los ajustes se conservan en escenarios y se comparan en una tabla propia. No se certifica seguridad de aterrizaje ni se detectan obstáculos menores que la malla. Método, fuentes y límites: [docs/TERRAIN_SCREENING.md](docs/TERRAIN_SCREENING.md).
