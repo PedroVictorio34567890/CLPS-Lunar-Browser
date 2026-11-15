@@ -11,8 +11,9 @@ import { Sun } from './Sun';
 import { Earth } from './Earth';
 import { SurfaceView } from './SurfaceView';
 import { sceneEphemeris } from '../science/sceneEphemeris';
-// Preserve the original camera distance, looking past the limb toward Earth.
-const INITIAL_CAMERA = new Vector3(-5, -0.6, 1.4).normalize().multiplyScalar(Math.hypot(3.2, 1.9, 3.8)).toArray();
+// Open on the illuminated southern hemisphere for the example dates.
+// This is only a camera position; lunar coordinates and ephemerides are unchanged.
+const INITIAL_CAMERA = new Vector3(3.4, -1.8, 3.3).normalize().multiplyScalar(Math.hypot(3.2, 1.9, 3.8)).toArray();
 class SceneBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
   state = { failed: false };
   static getDerivedStateFromError() { return { failed: true }; }
@@ -50,7 +51,7 @@ function PinLabel({ site }: { site: CandidateSite }) {
 function Moon({ sites, onSelect, canSelect }: { sites: CandidateSite[]; onSelect: (c: Coordinates) => void; canSelect: () => boolean }) {
   useLanguage();
   const mesh = useRef<Mesh>(null!);
-  const map = useTexture('/textures/lroc_color_2k.jpg');
+  const map = useTexture(`${import.meta.env.BASE_URL}textures/lroc_color_2k.jpg`);
   map.colorSpace = SRGBColorSpace;
   map.anisotropy = 8;
   const polarRing = useMemo(() => Array.from({ length: 129 }, (_, i) => geographicToCartesian({ latitude: -80, longitude: i / 128 * 360 }, 1.003)), []);
@@ -58,7 +59,7 @@ function Moon({ sites, onSelect, canSelect }: { sites: CandidateSite[]; onSelect
       <mesh ref={mesh} onClick={event => { event.stopPropagation(); if (event.button !== 0 || event.delta > 4 || !canSelect()) return; const local = mesh.current.worldToLocal(event.point.clone()); onSelect(cartesianToGeographic(local.toArray())); }}>
       <sphereGeometry args={[1, 128, 96]}/><meshStandardMaterial map={map} roughness={1} metalness={0}/>
     </mesh>
-    <Line points={polarRing} color="#b7dc90" transparent opacity={0.55} lineWidth={1} raycast={() => null}/>
+    <Line points={polarRing} color="#94c8ff" transparent opacity={0.55} lineWidth={1} raycast={() => null}/>
     {sites.map(site => {
       const p = geographicToCartesian(site, 1.025);
       const normal = new Vector3(...p).normalize();
@@ -72,9 +73,9 @@ function Moon({ sites, onSelect, canSelect }: { sites: CandidateSite[]; onSelect
   </group>;
 }
 export function MoonScene({ sites, onSelect, timestamp, surfaceSite, surfaceReport }: { sites: CandidateSite[]; onSelect: (c: Coordinates) => void; timestamp: number; surfaceSite?: CandidateSite; surfaceReport?: SiteReport }) {
-  useLanguage();
+  const en = useLanguage() === 'en';
   const bodies = useMemo(() => sceneEphemeris(timestamp), [timestamp]);
-  const [automatic, setAutomatic] = useState(true);
+  const [automatic, setAutomatic] = useState(() => !window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   const [resetKey, setResetKey] = useState(0);
   const pointers = useRef(new Set<number>());
   const multitouch = useRef(false);
@@ -84,14 +85,14 @@ export function MoonScene({ sites, onSelect, timestamp, surfaceSite, surfaceRepo
     <div className="scene-title"><div className="eyebrow">{t("EXPLORADOR DE SUPERFICIE")}</div><h1>{t("Un lugar para")}<br/><span>{t("la próxima misión.")}</span></h1><p>{t("Explora la Luna. Prepara tu comparación.")}</p></div>
     <div className="scene-status"><span className={automatic ? 'status-dot active' : 'status-dot'}/>{automatic ? t("Órbita automática de cámara") : t("Exploración manual")}</div>
     <div className="canvas-wrap" onPointerDownCapture={event => { if (!pointers.current.size) { multitouch.current = false; dragged.current = false; gestureStart.current = [event.clientX, event.clientY]; } pointers.current.add(event.pointerId); if (pointers.current.size > 1) multitouch.current = true; setAutomatic(false); }} onPointerMoveCapture={event => { if (pointers.current.size && Math.hypot(event.clientX - gestureStart.current[0], event.clientY - gestureStart.current[1]) > 4) dragged.current = true; }} onPointerUpCapture={event => pointers.current.delete(event.pointerId)} onPointerCancelCapture={event => { pointers.current.delete(event.pointerId); multitouch.current = true; }} onWheelCapture={() => setAutomatic(false)}>
-      <SceneBoundary><Canvas camera={{ position: INITIAL_CAMERA, fov: 33, near: 0.1, far: 300000 }} dpr={[1, 1.75]} gl={{ antialias: true }} fallback={<div className="scene-fallback">{t("WebGL no está disponible. Usa el formulario de coordenadas.")}</div>}>
+      <SceneBoundary><Canvas camera={{ position: INITIAL_CAMERA, fov: 33, near: 0.1, far: 300000 }} dpr={[1, 1.75]} gl={{ antialias: true }} fallback={<div className="scene-fallback"><div className="scene-fallback-message"><strong>{en ? '3D view unavailable' : 'Vista 3D no disponible'}</strong>{en ? 'This browser cannot display WebGL. You can still add coordinates or the Shackleton example and calculate your mission report.' : 'Este navegador no puede mostrar WebGL. Puedes añadir coordenadas o el ejemplo de Shackleton y calcular el informe de misión.'}</div></div>}>
         <ambientLight intensity={0.08}/><Sun position={bodies.sun}/><Stars/>
         <Suspense fallback={null}><Moon sites={sites} onSelect={onSelect} canSelect={() => !multitouch.current && !dragged.current}/></Suspense>
         <Suspense fallback={null}><Earth position={bodies.earth}/></Suspense>
         <Controls automatic={automatic && !surfaceSite} resetKey={resetKey} onInteract={() => setAutomatic(false)}/>
       </Canvas></SceneBoundary>
     </div>
-    <div className="scene-bottom"><div className="gesture-hint"><MousePointer2 size={15}/><span>{t("Pulsa para marcar")} <b>·</b>  {t("Arrastra para orbitar")} <b>·</b>  {t("Rueda o pellizca para zoom")}</span></div><button className="reset-button" onClick={() => { setResetKey(k => k + 1); setAutomatic(true); }}><RotateCcw size={14}/>  {t("Restablecer vista")}</button></div>
+    <div className="scene-bottom"><div className="gesture-hint"><MousePointer2 size={15}/><span>{t("Pulsa para marcar")} <b>·</b>  {t("Arrastra para orbitar")} <b>·</b>  {t("Rueda o pellizca para zoom")}</span></div><button className="reset-button" onClick={() => { setResetKey(k => k + 1); setAutomatic(!window.matchMedia('(prefers-reduced-motion: reduce)').matches); }}><RotateCcw size={14}/>  {t("Restablecer vista")}</button></div>
     <div className="scene-caption"><span><ScanLine size={12}/>  {t("Tierra–Luna a escala real · efemérides UTC")}</span><span>{t("Iluminación sobre esfera")}</span></div>
     {surfaceSite && <SceneBoundary><SurfaceView key={surfaceSite.id + ':' + surfaceSite.latitude + ':' + surfaceSite.longitude} site={surfaceSite} timestamp={timestamp} report={surfaceReport}/></SceneBoundary>}
   </section>;

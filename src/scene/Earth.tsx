@@ -7,7 +7,7 @@ export const EARTH_RADIUS = 6371 / MOON_RADIUS_KM;
 
 
 export function Earth({ position }: { position: [number, number, number] }) {
-  const map = useTexture('/textures/earth_atmos_2048.jpg');
+  const map = useTexture(`${import.meta.env.BASE_URL}textures/earth_atmos_2048.jpg`);
   map.colorSpace = SRGBColorSpace;
   map.anisotropy = 8;
 
